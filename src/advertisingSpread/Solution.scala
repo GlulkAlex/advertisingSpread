@@ -1,9 +1,9 @@
 package advertisingSpread
 
 import math._
-import scala.util._
-import scala.io.StdIn.readInt
-import scala.io.StdIn.readLine
+//import scala.util._
+//import scala.io.StdIn.readInt
+//import scala.io.StdIn.readLine
 import scala.io.Source
 
 /*description:
@@ -13,23 +13,28 @@ find minimum possible path length (in steps) for / in tree
 from nodes to all leafs & root
 */
 /** TODO:
-  * 1. remove Array input & to Vector conversion
-  * all input directly to Vector[(Int, Int)]
-  * 2. fill 'leafs' at the input step / procedure / phase
+  * (-1.) remove Array input & to Vector conversion
+  * all input directly to Vector[(Int, Int)] ???
+  * vectors good in intense search
+  * (fast random selections & fast random functional updates)
+  * not when elements added so
+  * >>may be '.toVector' in the right plays is enough ?
+  * (-2.) fill 'leafs' at the input step / procedure / phase
   * in / as separate input Vector[Int]
-  * check current node if in 'leafs' then remove it from there
-  * 3. add 'height' value = maxPath = longestPath &
+  * check current node if in 'leafs' then remove it from there ???
+  * >>not work that way, incorrect algorithm
+  * -3. add 'height' value = maxPath = longestPath &
   * 'heightLeaf' = leaf value:Int
-  * 4. add path check if maxPath from 'fork' to 'root' or 'heightLeaf'
+  * -4. add path check if maxPath from 'fork' to 'root' or 'heightLeaf'
   * greater then 'height' / 2 then
   * find that 'heightMiddle' node, starting from 'heightLeaf' &
   * 'heightMiddle' maxPath = 'height' / 2 if 'height' even or else ('height' - 1) / 2 + 1
-  * 5. find maxPath / longestPath from 'fork' to 'leafs' without 'heightLeaf'
+  * -5. find maxPath / longestPath from 'fork' to 'leafs' without 'heightLeaf'
   * as 'secondAfterLeaf' path:Vector & leaf:Int
   * if 'heightMiddle' maxPath less then ('heightMiddle' path to 'fork') +
   * 'secondAfterLeaf' path then that is the 'minPath' to return
   * 6. crate / write unit tests
-  * 7. add input from file
+  * (+7). add input from file
   */
 /*
   test 6: fails
@@ -40,6 +45,15 @@ from nodes to all leafs & root
   not optimized enough to handle some cases."
   vector size 30 000+
   */
+/*Note:
+ * 'Mutable Collections'
+* 'Array' 
+* (Scala arrays are 
+* native JVM arrays at runtime, therefore 
+* they are very performant)*/
+/* possble use of '.toSet' to
+ * eliminate duplicates or 'distinct' Operation on sequences    
+ * */
 object Solution {
 
   /*fork is
@@ -215,9 +229,10 @@ object Solution {
       ( 2, 3 ),
       ( 4, 5 ),
       ( 4, 6 ) ) //min path == 2
+
     //default path needed
     //if not implicit
-    val testNumber = "1"
+    val testNumber = 10
     val filename = "Test_" + testNumber + "_input.txt"
     val filePath = "E:\\Java\\coursera-workspace\\Challenge\\"
     val currFile = Source
@@ -225,17 +240,21 @@ object Solution {
     val currFileLines = Source
       .fromFile( filePath + filename )
       .getLines()
+    /*as 1st line is '.head'*/
+    /*to skip 1st line in file*/
     val n = if ( currFileLines.hasNext ) {
-      currFileLines.next()
-    } else { 0 }
+      currFileLines.next().toInt
+    } else { 0 } //*works
     val fileContent: Iterator[ String ] = Iterator()
-    val testGraph: Vector[ ( Int, Int ) ] = try {
-      //val fileContent: Iterator[ ( Int, Int ) ] = try {
-      //*(
+    //val testGraph: Vector[ ( Int, Int ) ] = Vector()
+    val pairArray: Array[ ( Int, Int ) ] =
+      new Array[ ( Int, Int ) ]( n )
+    val leafsArray = new Array[ Int ]( n )
 
-      /** My effective code must be within that loop / for expression
-        */
-      //*for ( i <- 0 until n ) {
+    /** My effective code must be
+      * within that loop / for expression
+      */
+    for ( i <- 0 until n ) {
       /*'xi': the identifier of a person related to 'yi'*/
       // xi: l'identifiant d'une personne liée à yi
       /*'yi': the identifier of a person related to 'xi'*/
@@ -244,46 +263,49 @@ object Solution {
       /*'readLine' read next string from input*/
       //*val Array( xi, yi ) = for ( i <- graph2( i ) split " " ) yield i.toInt
       //*println("Array(xi, yi) is: (" + xi + ", " + yi + ")")
-      //*} //yield i
-      (
-      for {
-        /*how to skip 1st line?*/
-        line <- Source
-          //i <- 0 until Source
-          .fromFile( filePath + filename )
-          .getLines() //; //.size
-        //*) //*yield line
-        /*for first line in file
-       * line.split( " " )( 1 ) index '1' is out of bounds
+      pairArray( i ) = currFileLines
+        .next()
+        .toString()
+        .split( " " ) match {
+          case x if x.size == 1 => ( -1, x.head.toInt )
+          case y if y.size == 2 => ( y.head.toInt, y( 1 ).toInt )
+          case _                => ( -1, -1 )
+        } //*works 
+
+      /*do not check against all elements in 'pairArray' only i-th count
+       * if any ._1 appear more then twice then
+       * check fails
+       * only distinct ._1 / nodes matters 
        * */
-      } yield ( line.split( " " )( 0 ).toInt, line.split( " " )( 1 ).toInt ) //:( Int, Int)
-    //} yield  line split " " map (arElem => arElem.toInt) //:Array[ Int ] 
-
-      //*} yield line
-      ).toVector
-      //*Vector()
-      /*{
-        val Array( xi, yi ) = for ( i <- line split " " ) yield i.toInt*/
-      //*println( line )
-      //*} 
-    } catch {
-      //*case ex: Exception => println("Bummer, an exception happened.")//*works
-      //*case ex: Exception => println( ex ) //*works even better
-      //*case ex: Exception => Iterator() /*Vector() */
-      case ex: Exception => Vector()
-    } //*works
-
-    //*val testGraph: Vector[ ( Int, Int ) ] = Vector()
-    /*for {
-      //index <- (1 to fileContent.size)
-      line <- fileContent
-      //if line.index > 0
-      //if line != fileContent.head
-      if line != fileContent.take( 1 )
-    } yield ( line.split( " " )( 0 ).toInt, line.split( " " )( 1 ).toInt )*/
+      //*leafsArray( i ) = pairArray( i )._2
+      /*leafsArray.indexOf( pairArray( i )._1 ) match {
+        case x if x > -1 => leafsArray( x ) = -1
+        //case x          => leafsArray( i ) = pairArray( i )._2
+        case x           => leafsArray( i )
+      }*/ //*work 
+    }
 
     //*val testGraph = test2
+    val testGraph: Vector[ ( Int, Int ) ] = pairArray.toVector
+    //testGraph unzip
+    //*val ( nodesSeq, leafsSeq ) = pairArray.unzip
+    /*for {
+      node: Int <- nodesSeq.toSet
+      } {print(node + ",")}*/ //*work
+    //*println( "nodesSeq is: " + ( nodesSeq mkString "," ) )
+    //*println( "leafsSeq is: " + ( leafsSeq mkString "," ) )
+    /*same as 'treeLeafs' but with zip instead of much
+    val leafs = ( for {
+      // *curNode: Int <- nodesSeq.toSet
+      // *curNode <- nodesSeq
+      curLeaf <- leafsSeq
+      // *if curNode != curLeaf
+    	if nodesSeq.forall(_ != curLeaf)
+    } yield curLeaf ).toVector*/ //*works
+
     val leafs = treeLeafs( testGraph )
+    //*println( "leafsArray was: " + ( leafsArray mkString "," ) )
+    //*val leafs = ( leafsArray filterNot ( _ == -1 ) ).toVector
     val maxPath = longestPath( testGraph, leafs )
     val fork = firstFork( testGraph )
     val minPath = pathToFork( testGraph, leafs, fork, maxPath )
@@ -304,6 +326,8 @@ object Solution {
     println( "testGraph first 7 elements is: " + testGraph.take( 7 ) )
     println( "minPath is: " + minPath.size )
     println( "minPath is: " + minPath )
+    println( "pairArray is: " + ( pairArray mkString "," ) )
+    println( "leafsArray is: " + ( leafsArray mkString "," ) )
     println( "leafs is: " + leafs )
     println( "treeLeafs1(testGraph) is: " + treeLeafs1( testGraph ) )
     println( "fork is: " + fork )

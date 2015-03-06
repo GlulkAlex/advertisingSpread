@@ -8,11 +8,11 @@ object fileIO_Test {
     /* location in "project" folder:
      * "E:\Java\coursera-workspace\Challenge"
      */
-    val writer = new PrintWriter( new File( "fileIOtest.txt" ) ) //*works
+    //val writer = new PrintWriter( new File( "fileIOtest.txt" ) ) //*works
 
-    writer.write( "Hello Scala!" ) //*works
-    writer.write( "Do you mind to work properly?" ) //*works
-    writer.close() //*works
+    //writer.write( "Hello Scala!" ) //*works
+//    writer.write( "Do you mind to work properly?" ) //*works
+//    writer.close() //*works
 
     println( "Following is the content read:" )
     /*Source.scala -- This object provides 

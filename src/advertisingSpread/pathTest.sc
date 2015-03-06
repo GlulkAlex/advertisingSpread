@@ -2,7 +2,6 @@ package advertisingSpread
 //import scala.util.matching.Regex
 
 object pathTest {
-  println( "Scala worksheet text output" )        //> Scala worksheet text output
   var myList = Array( 1.9, 2.9, 3.4, 3.5 )        //> myList  : Array[Double] = Array(1.9, 2.9, 3.4, 3.5)
 
   println( "myList(0):" + myList( 0 ) )           //> myList(0):1.9
@@ -65,47 +64,87 @@ object pathTest {
   graph2( 0 ).split( " " )                        //> res3: Array[String] = Array(1, 2)
   graph2( 0 ).split( " " )( 1 )                   //> res4: String = 2
   graph2( 0 ).split( " " )( 1 ).toInt             //> res5: Int = 2
+  "1".split( " " )                                //> res6: Array[String] = Array(1)
+  "1 2".splitAt( 1 )                              //> res7: (String, String) = (1," 2")
+
+  val n12_l112 = "12 112"                         //> n12_l112  : String = 12 112
+
+  n12_l112.splitAt( n12_l112.indexOf( " " ) )     //> res8: (String, String) = (12," 112")
+  "112".splitAt( "112".indexOf( " " ) )           //> res9: (String, String) = ("",112)
+  "112".splitAt( "112".indexOf( " " ) ) match {
+      case ("", x) => (-1, x.toInt)
+      case (y, x) => (y.toInt, x.toInt)
+      case _ => (-1, -1)
+  }                                               //> res10: (Int, Int) = (-1,112)
+  "112".split( " " ) match {
+      case Array("", x) => (-1, x.toInt)
+      case Array(y, x) => (y.toInt, x.toInt)
+      case _ => (-1, -1)
+  }                                               //> res11: (Int, Int) = (-1,-1)
+  "112".split( " " ) match {
+      case x if x.size == 1 => (-1, x.head.toInt)
+      //*case y if y.size == 2 => (y.head.toInt, y.tail/*.toInt*/)
+      case y if y.size == 2 => (y.head.toInt, y(1).toInt)
+      case _ => (-1, -1)
+  }                                               //> res12: (Int, Int) = (-1,112)
+  "12 112".split( " " ) match {
+      case x if x.size == 1 => (-1, x.head.toInt)
+      //*case y if y.size == 2 => (y.head.toInt, y.tail/*.toInt*/)
+      case y if y.size == 2 => (y.head.toInt, y(1).toInt)
+      case _ => (-1, -1)
+  }                                               //> res13: (Int, Int) = (12,112)
+  /*java.lang.NumberFormatException:
+  "112".splitAt( "112".indexOf( " " ) )._1.toInt*/
+  val set112 = "112".toSet                        //> set112  : scala.collection.immutable.Set[Char] = Set(1, 2)
+  
+  set112.splitAt( 0 )                             //> res14: (scala.collection.immutable.Set[Char], scala.collection.immutable.Se
+                                                  //| t[Char]) = (Set(),Set(1, 2))
+  set112
+    .find { x => x == ' ' }
+      .orElse(Some(-1)) /*withDefaultValue*/      //> res15: Option[AnyVal{def getClass(): Class[_ >: Char with Int <: AnyVal]}] 
+                                                  //| = Some(-1)
+  n12_l112.split( " " )                           //> res16: Array[String] = Array(12, 112)
   //java.lang.String cannot be cast to java.lang.Integer or Long or Double or Short                                                Integer
   //graph2(0).split(" ")(1).asInstanceOf[Int]
   /*graph2(0).split(" ")(1).charAt(0)
   //graph2(0).split(" ")(1).charAt(0).toShort*/
   val x = graph2( 0 ).split( " " )( 1 )           //> x  : String = 2
   //x.toInt //char2int
-  "1".length()                                    //> res6: Int = 1
-  "2".##()                                        //> res7: Int = 50
-  "3".toSeq                                       //> res8: Seq[Char] = 3
-  "4".toFloat                                     //> res9: Float = 4.0
-  "5".toInt                                       //> res10: Int = 5
-  graph2 ++ myList                                //> res11: Array[Any] = Array(1 2, 2 3, 3 4, 3 7, 4 5, 4 6, 7 8, 1.9, 2.9, 3.4,
+  "1".length()                                    //> res17: Int = 1
+  "2".##()                                        //> res18: Int = 50
+  "3".toSeq                                       //> res19: Seq[Char] = 3
+  "4".toFloat                                     //> res20: Float = 4.0
+  "5".toInt                                       //> res21: Int = 5
+  graph2 ++ myList                                //> res22: Array[Any] = Array(1 2, 2 3, 3 4, 3 7, 4 5, 4 6, 7 8, 1.9, 2.9, 3.4,
                                                   //|  3.5)
-  graph2.size                                     //> res12: Int = 7
-  graph2( graph2.size - 1 )                       //> res13: String = 7 8
-  graph2.last                                     //> res14: String = 7 8
-  graph2.indices                                  //> res15: scala.collection.immutable.Range = Range(0, 1, 2, 3, 4, 5, 6)
-  graph2.take( 3 )                                //> res16: Array[String] = Array(1 2, 2 3, 3 4)
-  graph2.drop( 3 )                                //> res17: Array[String] = Array(3 7, 4 5, 4 6, 7 8)
-  graph2.dropRight( 3 )                           //> res18: Array[String] = Array(1 2, 2 3, 3 4, 3 7)
+  graph2.size                                     //> res23: Int = 7
+  graph2( graph2.size - 1 )                       //> res24: String = 7 8
+  graph2.last                                     //> res25: String = 7 8
+  graph2.indices                                  //> res26: scala.collection.immutable.Range = Range(0, 1, 2, 3, 4, 5, 6)
+  graph2.take( 3 )                                //> res27: Array[String] = Array(1 2, 2 3, 3 4)
+  graph2.drop( 3 )                                //> res28: Array[String] = Array(3 7, 4 5, 4 6, 7 8)
+  graph2.dropRight( 3 )                           //> res29: Array[String] = Array(1 2, 2 3, 3 4, 3 7)
   graph2.dropWhile { x => x.split( " " )( 0 ).toInt == 4 }
-                                                  //> res19: Array[String] = Array(1 2, 2 3, 3 4, 3 7, 4 5, 4 6, 7 8)
+                                                  //> res30: Array[String] = Array(1 2, 2 3, 3 4, 3 7, 4 5, 4 6, 7 8)
   graph2.dropWhile { x => x.split( " " )( 0 ) == "3" }
-                                                  //> res20: Array[String] = Array(1 2, 2 3, 3 4, 3 7, 4 5, 4 6, 7 8)
-  graph2.dropWhile { x => x == "3 4" }            //> res21: Array[String] = Array(1 2, 2 3, 3 4, 3 7, 4 5, 4 6, 7 8)
+                                                  //> res31: Array[String] = Array(1 2, 2 3, 3 4, 3 7, 4 5, 4 6, 7 8)
+  graph2.dropWhile { x => x == "3 4" }            //> res32: Array[String] = Array(1 2, 2 3, 3 4, 3 7, 4 5, 4 6, 7 8)
   /*to gain duplicate values or group by*/
   val currNode = graph2( 2 ).split( " " )( 0 ).toInt
                                                   //> currNode  : Int = 3
   val dub1 = graph2.filter { x => x.split( " " )( 0 ).toInt == currNode }
                                                   //> dub1  : Array[String] = Array(3 4, 3 7)
   graph2.count { x => x.split( " " )( 0 ).toInt == currNode }
-                                                  //> res22: Int = 2
-  dub1.isEmpty                                    //> res23: Boolean = false
+                                                  //> res33: Int = 2
+  dub1.isEmpty                                    //> res34: Boolean = false
   graph2.filterNot { x => x.split( " " )( 0 ).toInt == 4 }
-                                                  //> res24: Array[String] = Array(1 2, 2 3, 3 4, 3 7, 7 8)
+                                                  //> res35: Array[String] = Array(1 2, 2 3, 3 4, 3 7, 7 8)
   graph2.find { x => x.split( " " )( 1 ).toInt == 4 }
-                                                  //> res25: Option[String] = Some(3 4)
+                                                  //> res36: Option[String] = Some(3 4)
   graph2.indexWhere { x => x.split( " " )( 1 ).toInt == 4 }
-                                                  //> res26: Int = 2
-  "0 0" +: graph2                                 //> res27: Array[String] = Array(0 0, 1 2, 2 3, 3 4, 3 7, 4 5, 4 6, 7 8)
-  graph2 :+ "10 10"                               //> res28: Array[String] = Array(1 2, 2 3, 3 4, 3 7, 4 5, 4 6, 7 8, 10 10)
+                                                  //> res37: Int = 2
+  "0 0" +: graph2                                 //> res38: Array[String] = Array(0 0, 1 2, 2 3, 3 4, 3 7, 4 5, 4 6, 7 8)
+  graph2 :+ "10 10"                               //> res39: Array[String] = Array(1 2, 2 3, 3 4, 3 7, 4 5, 4 6, 7 8, 10 10)
   /*Unit loop*/
   graph2.foreach { x => print( x + ',' ) }        //> 1 2,2 3,3 4,3 7,4 5,4 6,7 8,
   // Print all the array elements
@@ -115,8 +154,8 @@ object pathTest {
                                                   //| 3.4
                                                   //| 3.5
   }
-  !true                                           //> res29: Boolean = false
-  graph1.unzip                                    //> res30: (Array[Int], Array[Int]) = (Array(1, 2, 3, 3, 4, 4, 7),Array(2, 3, 4
+  !true                                           //> res40: Boolean = false
+  graph1.unzip                                    //> res41: (Array[Int], Array[Int]) = (Array(1, 2, 3, 3, 4, 4, 7),Array(2, 3, 4
                                                   //| , 7, 5, 6, 8))
   /** In 'Scala',
     * 'pattern matching' does not appears only
@@ -166,20 +205,20 @@ object pathTest {
 	get fine tuned 'pattern matching' when
 	'pattern matching' alone is not enough.*/
   for ( p <- graph2 if p.split( " " )( 1 ).toInt > 20 ) yield p
-                                                  //> res31: Array[String] = Array()
+                                                  //> res42: Array[String] = Array()
   for ( p <- graph2 if p.split( " " )( 1 ).toInt > graph2.size ) yield p.split( " " )( 0 ).toInt
-                                                  //> res32: Array[Int] = Array(7)
+                                                  //> res43: Array[Int] = Array(7)
   for ( p <- graph2 if p.split( " " )( 1 ).toInt == 7 ) yield p
-                                                  //> res33: Array[String] = Array(3 7)
+                                                  //> res44: Array[String] = Array(3 7)
   for ( p <- graph2 if p.split( " " )( 1 ).toInt <= graph2.size ) yield p
-                                                  //> res34: Array[String] = Array(1 2, 2 3, 3 4, 3 7, 4 5, 4 6)
-  graph2.length                                   //> res35: Int = 7
+                                                  //> res45: Array[String] = Array(1 2, 2 3, 3 4, 3 7, 4 5, 4 6)
+  graph2.length                                   //> res46: Int = 7
   /*combination of sum operands equal 'x'*/
   for {
     i <- 1 to 8
     j <- 1 until 8
     if ( i + j == 8 )
-  } yield ( i, j )                                //> res36: scala.collection.immutable.IndexedSeq[(Int, Int)] = Vector((1,7), (2
+  } yield ( i, j )                                //> res47: scala.collection.immutable.IndexedSeq[(Int, Int)] = Vector((1,7), (2
                                                   //| ,6), (3,5), (4,4), (5,3), (6,2), (7,1))
   val sPair = "1 2"                               //> sPair  : String = 1 2
   /*r( ) method.
@@ -194,7 +233,7 @@ object pathTest {
   val pattern = "(\\d)\\s(\\d)".r( "node", "leaf" ) //*work
                                                   //> pattern  : scala.util.matching.Regex = (\d)\s(\d)
   //*(pattern findAllIn sPair).mkString(",")
-  pattern.toString()                              //> res37: String = (\d)\s(\d)
+  pattern.toString()                              //> res48: String = (\d)\s(\d)
   //pattern._1
   /*'Regex' in 'case pattern matching'*/
   /*There are two ways of
@@ -215,17 +254,17 @@ object pathTest {
                                                   //| leaf1  : String = 2
 
   for ( m <- pattern findFirstMatchIn sPair ) yield m group "node" //*works
-                                                  //> res38: Option[String] = Some(1)
+                                                  //> res49: Option[String] = Some(1)
   for ( m <- pattern findFirstMatchIn sPair ) yield m group "leaf" //*works
-                                                  //> res39: Option[String] = Some(2)
+                                                  //> res50: Option[String] = Some(2)
   for ( m <- pattern findFirstMatchIn sPair ) yield ( m group "node", m group "leaf" ) //*works
-                                                  //> res40: Option[(String, String)] = Some((1,2))
+                                                  //> res51: Option[(String, String)] = Some((1,2))
 
   for {
     elem <- graph1
     /*Pattern Matching*/
     ( node, leaf ) = elem
-  } yield ( node, leaf )                          //> res41: Array[(Int, Int)] = Array((1,2), (2,3), (3,4), (3,7), (4,5), (4,6), 
+  } yield ( node, leaf )                          //> res52: Array[(Int, Int)] = Array((1,2), (2,3), (3,4), (3,7), (4,5), (4,6), 
                                                   //| (7,8))
 
   for {
@@ -234,7 +273,7 @@ object pathTest {
     if graph1.forall {
       case ( nodeX, leafX ) => nodeX != leaf
     }
-  } yield ( node, leaf ) //*works                 //> res42: Array[(Int, Int)] = Array((4,5), (4,6), (7,8))
+  } yield ( node, leaf ) //*works                 //> res53: Array[(Int, Int)] = Array((4,5), (4,6), (7,8))
 
   ( for {
     /*Pattern Matching*/
@@ -243,7 +282,7 @@ object pathTest {
     if ( node2 < leaf1 &&
       leaf1 < leaf2 &&
       node1 < leaf2 )
-  } yield leaf1 ).distinct //*works               //> res43: Array[Int] = Array(4, 5, 6)
+  } yield leaf1 ).distinct //*works               //> res54: Array[Int] = Array(4, 5, 6)
 
   for {
     /*Pattern Matching*/
@@ -253,14 +292,14 @@ object pathTest {
       //node1 < node2 &&
       leaf1 < leaf2 &&
       node1 < leaf2 )
-  } yield leaf1                                   //> res44: Array[Int] = Array(4, 5, 5, 6)
+  } yield leaf1                                   //> res55: Array[Int] = Array(4, 5, 5, 6)
 
   for {
     p <- graph2
     leaf <- 1 to 7
     node <- 1 until 7
     if ( node + " " + leaf == p )
-  } yield ( node, leaf )                          //> res45: Array[(Int, Int)] = Array((1,2), (2,3), (3,4), (3,7), (4,5), (4,6))
+  } yield ( node, leaf )                          //> res56: Array[(Int, Int)] = Array((1,2), (2,3), (3,4), (3,7), (4,5), (4,6))
                                                   //| 
   //*val Array(xi, yi) = for (i <- graph2(0) split " ") yield i.toInt
   val n = 7 // le nombre 'n' de relations au total.
@@ -295,21 +334,21 @@ object pathTest {
                                                   //| (4,5),size:5,isEmpty:false
                                                   //| (4,6),size:6,isEmpty:false
                                                   //| (7,8),size:7,isEmpty:false
-  inputStore                                      //> res46: Array[(Int, Int)] = Array((1,2), (2,3), (3,4), (3,7), (4,5), (4,6), 
+  inputStore                                      //> res57: Array[(Int, Int)] = Array((1,2), (2,3), (3,4), (3,7), (4,5), (4,6), 
                                                   //| (7,8))
-  inputVector                                     //> res47: Vector[(Int, Int)] = Vector((1,2), (2,3), (3,4), (3,7), (4,5), (4,6)
+  inputVector                                     //> res58: Vector[(Int, Int)] = Vector((1,2), (2,3), (3,4), (3,7), (4,5), (4,6)
                                                   //| , (7,8))
-  inputStore.size                                 //> res48: Int = 7
-  inputStore.mkString( "[", ",", "]" )            //> res49: String = [(1,2),(2,3),(3,4),(3,7),(4,5),(4,6),(7,8)]
+  inputStore.size                                 //> res59: Int = 7
+  inputStore.mkString( "[", ",", "]" )            //> res60: String = [(1,2),(2,3),(3,4),(3,7),(4,5),(4,6),(7,8)]
   val inputVector2 = inputStore.toVector          //> inputVector2  : Vector[(Int, Int)] = Vector((1,2), (2,3), (3,4), (3,7), (4,
                                                   //| 5), (4,6), (7,8))
-  inputVector2.head                               //> res50: (Int, Int) = (1,2)
-  inputVector2( 2 )                               //> res51: (Int, Int) = (3,4)
-  inputVector2.last                               //> res52: (Int, Int) = (7,8)
+  inputVector2.head                               //> res61: (Int, Int) = (1,2)
+  inputVector2( 2 )                               //> res62: (Int, Int) = (3,4)
+  inputVector2.last                               //> res63: (Int, Int) = (7,8)
   for {
     i <- 0 until n
     //Array(node, leaf) <- graph2(i) split " "
-  } yield graph2( i ) split " "                   //> res53: scala.collection.immutable.IndexedSeq[Array[String]] = Vector(Array(
+  } yield graph2( i ) split " "                   //> res64: scala.collection.immutable.IndexedSeq[Array[String]] = Vector(Array(
                                                   //| 1, 2), Array(2, 3), Array(3, 4), Array(3, 7), Array(4, 5), Array(4, 6), Arr
                                                   //| ay(7, 8))
 
@@ -318,14 +357,14 @@ object pathTest {
   val Array( node2, leaf2 ) = graph2( 0 ) split " "
                                                   //> node2  : String = 1
                                                   //| leaf2  : String = 2
-  gr2Elem0( 0 )                                   //> res54: String = 1
-  gr2Elem0( 1 )                                   //> res55: String = 2
+  gr2Elem0( 0 )                                   //> res65: String = 1
+  gr2Elem0( 1 )                                   //> res66: String = 2
   //*representation
-  graph2.mkString( "[", ",", "]" )                //> res56: String = [1 2,2 3,3 4,3 7,4 5,4 6,7 8]
+  graph2.mkString( "[", ",", "]" )                //> res67: String = [1 2,2 3,3 4,3 7,4 5,4 6,7 8]
   graph2.exists { x => x.split( " " )( 0 ).toInt == 4 }
-                                                  //> res57: Boolean = true
-  for ( i <- graph2( 0 ) split " " ) yield i      //> res58: Array[String] = Array(1, 2)
-  for ( i <- graph2( 0 ) split " " ) yield i.toInt//> res59: Array[Int] = Array(1, 2)
+                                                  //> res68: Boolean = true
+  for ( i <- graph2( 0 ) split " " ) yield i      //> res69: Array[String] = Array(1, 2)
+  for ( i <- graph2( 0 ) split " " ) yield i.toInt//> res70: Array[Int] = Array(1, 2)
   val sampleAr1 = Array( "1", "2" )               //> sampleAr1  : Array[String] = Array(1, 2)
   //(Array("1", "2")).toInt
   //sampleAr1.toInt
@@ -547,28 +586,28 @@ object pathTest {
   val fork = firstFork( testGraph )               //> fork  : Int = 0
   val leafs = treeLeafs( testGraph )              //> leafs  : Vector[Int] = Vector(3, 4, 6, 7, 10, 11, 13, 14, 17, 18, 20, 21)
                                                   //| 
-  treeLeafs2( testGraph )                         //> res60: Vector[Int] = Vector(3, 4, 6, 7, 10, 11, 13, 14, 17, 18, 20, 21)
-  treeLeafs3( testGraph )                         //> res61: Vector[Int] = Vector(3, 4, 6, 7, 10, 11, 13, 14, 17, 18, 20, 21)
-  treeLeafs4( testGraph )                         //> res62: Vector[Int] = Vector(3, 4, 6, 7, 10, 11, 13, 14, 17, 18, 20, 21)
+  treeLeafs2( testGraph )                         //> res71: Vector[Int] = Vector(3, 4, 6, 7, 10, 11, 13, 14, 17, 18, 20, 21)
+  treeLeafs3( testGraph )                         //> res72: Vector[Int] = Vector(3, 4, 6, 7, 10, 11, 13, 14, 17, 18, 20, 21)
+  treeLeafs4( testGraph )                         //> res73: Vector[Int] = Vector(3, 4, 6, 7, 10, 11, 13, 14, 17, 18, 20, 21)
   val maxPath = longestPath( testGraph, leafs )   //> maxPath  : Vector[(Int, Int)] = Vector((2,3), (1,2), (0,1))
   val minPath = pathToFork( testGraph, leafs, fork, maxPath )
                                                   //> minPath  : Vector[(Int, Int)] = Vector((2,3), (1,2), (0,1))
 
-  Vector() :+ 1                                   //> res63: scala.collection.immutable.Vector[Int] = Vector(1)
-  inputVector2                                    //> res64: Vector[(Int, Int)] = Vector((1,2), (2,3), (3,4), (3,7), (4,5), (4,6
+  Vector() :+ 1                                   //> res74: scala.collection.immutable.Vector[Int] = Vector(1)
+  inputVector2                                    //> res75: Vector[(Int, Int)] = Vector((1,2), (2,3), (3,4), (3,7), (4,5), (4,6
                                                   //| ), (7,8))
-  inputVector2.count { x => x._1 == 1 }           //> res65: Int = 1
-  inputVector2.count { x => x._1 == 3 }           //> res66: Int = 2
-  inputVector2.count { x => x._1 == 8 }           //> res67: Int = 0
-  inputVector2.count { x => x._1 == 5 }           //> res68: Int = 0
-  inputVector2.count { x => x._1 == 6 }           //> res69: Int = 0
-  inputVector2.count { x => x._1 == 7 }           //> res70: Int = 1
-  firstFork( lineVecTest )                        //> res71: Int = 1
-  pathToRoot( inputVector2, 1 )                   //> res72: Vector[(Int, Int)] = Vector()
-  pathToRoot( inputVector2, 3 )                   //> res73: Vector[(Int, Int)] = Vector((2,3), (1,2))
-  pathToRoot( inputVector2, 8 )                   //> res74: Vector[(Int, Int)] = Vector((7,8), (3,7), (2,3), (1,2))
+  inputVector2.count { x => x._1 == 1 }           //> res76: Int = 1
+  inputVector2.count { x => x._1 == 3 }           //> res77: Int = 2
+  inputVector2.count { x => x._1 == 8 }           //> res78: Int = 0
+  inputVector2.count { x => x._1 == 5 }           //> res79: Int = 0
+  inputVector2.count { x => x._1 == 6 }           //> res80: Int = 0
+  inputVector2.count { x => x._1 == 7 }           //> res81: Int = 1
+  firstFork( lineVecTest )                        //> res82: Int = 1
+  pathToRoot( inputVector2, 1 )                   //> res83: Vector[(Int, Int)] = Vector()
+  pathToRoot( inputVector2, 3 )                   //> res84: Vector[(Int, Int)] = Vector((2,3), (1,2))
+  pathToRoot( inputVector2, 8 )                   //> res85: Vector[(Int, Int)] = Vector((7,8), (3,7), (2,3), (1,2))
 
-  def intPair( line: String )/*: ( Int, Int )*/ = {
+  def intPair( line: String ) /*: ( Int, Int )*/ = {
     var node = ""
     var leaf = "" //: String = "-1"
     var delim = ""
@@ -576,11 +615,11 @@ object pathTest {
     for (
       i <- 0 until line.size
     ) {
-      val char = line.charAt(i)
-      
-      println ("char=" + char)
+      val char = line.charAt( i )
+
+      println( "char=" + char )
       if ( i == 0 ) {
-      //skip ?
+        //skip ?
         node += char
         //} else if ( char == line.last ) {
       } else if ( char.toString() == " " ) {
@@ -600,8 +639,8 @@ object pathTest {
     //( node.toInt, leaf.toInt )
     ( node, leaf )
   }                                               //> intPair: (line: String)(String, String)
-  
-  def strPair( line: String )/*: ( String, String )*/ = {
+
+  def strPair( line: String ) /*: ( String, String )*/ = {
     var node = ""
     var leaf = ""
     var delim = ""
@@ -609,14 +648,14 @@ object pathTest {
     for (
       char <- line
     ) {
-      
+
       //*println ("char=" + char)
       if ( char == line.head ) {
-      //skip ?
+        //skip ?
         node += char
         //} else if ( char == line.last ) {
-      //*} else if ( char == ' ' ) {
-      /*or*/
+        //*} else if ( char == ' ' ) {
+        /*or*/
       } else if ( char.isSpaceChar ) {
         //node ends
         delim = " "
@@ -634,25 +673,25 @@ object pathTest {
     //( node.toInt, leaf.toInt )
     ( node, leaf )
   }                                               //> strPair: (line: String)(String, String)
-  
+
   val fileStr = "1 2"                             //> fileStr  : String = 1 2
-  
-  fileStr.charAt(0)                               //> res75: Char = 1
-  fileStr.charAt(2)                               //> res76: Char = 2
+
+  fileStr.charAt( 0 )                             //> res86: Char = 1
+  fileStr.charAt( 2 )                             //> res87: Char = 2
   intPair( fileStr )                              //> char=1
                                                   //| char= 
                                                   //| char=2
-                                                  //| res77: (String, String) = (1,2)
+                                                  //| res88: (String, String) = (1,2)
   intPair( "3" )                                  //> char=3
-                                                  //| res78: (String, String) = (3,"")
-  strPair( "4" )                                  //> res79: (String, String) = (4,"")
-  strPair( "5 6" )                                //> res80: (String, String) = (5,6)
-  " ".charAt(0).isSpaceChar                       //> res81: Boolean = true
-  " ".charAt(0).charValue() == " "                //> res82: Boolean = false
-  " ".charAt(0).charValue() == ' '                //> res83: Boolean = true
-  " ".charAt(0) == ' '                            //> res84: Boolean = true
-  " ".charAt(0).isWhitespace                      //> res85: Boolean = true
-  " ".charAt(0).getNumericValue                   //> res86: Int = -1
-  " ".equalsIgnoreCase(" ")                       //> res87: Boolean = true
-  
+                                                  //| res89: (String, String) = (3,"")
+  strPair( "4" )                                  //> res90: (String, String) = (4,"")
+  strPair( "5 6" )                                //> res91: (String, String) = (5,6)
+  " ".charAt( 0 ).isSpaceChar                     //> res92: Boolean = true
+  " ".charAt( 0 ).charValue() == " "              //> res93: Boolean = false
+  " ".charAt( 0 ).charValue() == ' '              //> res94: Boolean = true
+  " ".charAt( 0 ) == ' '                          //> res95: Boolean = true
+  " ".charAt( 0 ).isWhitespace                    //> res96: Boolean = true
+  " ".charAt( 0 ).getNumericValue                 //> res97: Int = -1
+  " ".equalsIgnoreCase( " " )                     //> res98: Boolean = true
+
 }
