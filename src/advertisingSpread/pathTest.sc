@@ -72,36 +72,36 @@ object pathTest {
   n12_l112.splitAt( n12_l112.indexOf( " " ) )     //> res8: (String, String) = (12," 112")
   "112".splitAt( "112".indexOf( " " ) )           //> res9: (String, String) = ("",112)
   "112".splitAt( "112".indexOf( " " ) ) match {
-      case ("", x) => (-1, x.toInt)
-      case (y, x) => (y.toInt, x.toInt)
-      case _ => (-1, -1)
+    case ( "", x ) => ( -1, x.toInt )
+    case ( y, x )  => ( y.toInt, x.toInt )
+    case _         => ( -1, -1 )
   }                                               //> res10: (Int, Int) = (-1,112)
   "112".split( " " ) match {
-      case Array("", x) => (-1, x.toInt)
-      case Array(y, x) => (y.toInt, x.toInt)
-      case _ => (-1, -1)
+    case Array( "", x ) => ( -1, x.toInt )
+    case Array( y, x )  => ( y.toInt, x.toInt )
+    case _              => ( -1, -1 )
   }                                               //> res11: (Int, Int) = (-1,-1)
   "112".split( " " ) match {
-      case x if x.size == 1 => (-1, x.head.toInt)
-      //*case y if y.size == 2 => (y.head.toInt, y.tail/*.toInt*/)
-      case y if y.size == 2 => (y.head.toInt, y(1).toInt)
-      case _ => (-1, -1)
+    case x if x.size == 1 => ( -1, x.head.toInt )
+    //*case y if y.size == 2 => (y.head.toInt, y.tail/*.toInt*/)
+    case y if y.size == 2 => ( y.head.toInt, y( 1 ).toInt )
+    case _                => ( -1, -1 )
   }                                               //> res12: (Int, Int) = (-1,112)
   "12 112".split( " " ) match {
-      case x if x.size == 1 => (-1, x.head.toInt)
-      //*case y if y.size == 2 => (y.head.toInt, y.tail/*.toInt*/)
-      case y if y.size == 2 => (y.head.toInt, y(1).toInt)
-      case _ => (-1, -1)
+    case x if x.size == 1 => ( -1, x.head.toInt )
+    //*case y if y.size == 2 => (y.head.toInt, y.tail/*.toInt*/)
+    case y if y.size == 2 => ( y.head.toInt, y( 1 ).toInt )
+    case _                => ( -1, -1 )
   }                                               //> res13: (Int, Int) = (12,112)
   /*java.lang.NumberFormatException:
   "112".splitAt( "112".indexOf( " " ) )._1.toInt*/
   val set112 = "112".toSet                        //> set112  : scala.collection.immutable.Set[Char] = Set(1, 2)
-  
+
   set112.splitAt( 0 )                             //> res14: (scala.collection.immutable.Set[Char], scala.collection.immutable.Se
                                                   //| t[Char]) = (Set(),Set(1, 2))
   set112
     .find { x => x == ' ' }
-      .orElse(Some(-1)) /*withDefaultValue*/      //> res15: Option[AnyVal{def getClass(): Class[_ >: Char with Int <: AnyVal]}] 
+    .orElse( Some( -1 ) ) /*withDefaultValue*/    //> res15: Option[AnyVal{def getClass(): Class[_ >: Char with Int <: AnyVal]}] 
                                                   //| = Some(-1)
   n12_l112.split( " " )                           //> res16: Array[String] = Array(12, 112)
   //java.lang.String cannot be cast to java.lang.Integer or Long or Double or Short                                                Integer
@@ -693,5 +693,20 @@ object pathTest {
   " ".charAt( 0 ).isWhitespace                    //> res96: Boolean = true
   " ".charAt( 0 ).getNumericValue                 //> res97: Int = -1
   " ".equalsIgnoreCase( " " )                     //> res98: Boolean = true
-
+  val test10 = Map( 6 -> 8, 15 -> 1, 1 -> 14, 0 -> 3, 15 -> 13,
+    9 -> 15, 2 -> 5, 14 -> 10, 4 -> 9, 7 -> 2,
+    8 -> 7, 3 -> 4, 1 -> 6 )                      //> test10  : scala.collection.immutable.Map[Int,Int] = Map(0 -> 3, 14 -> 10, 
+                                                  //| 1 -> 6, 6 -> 8, 9 -> 15, 2 -> 5, 7 -> 2, 3 -> 4, 8 -> 7, 4 -> 9, 15 -> 13)
+                                                  //| 
+  test10.toList.sorted                            //> res99: List[(Int, Int)] = List((0,3), (1,6), (2,5), (3,4), (4,9), (6,8), (
+                                                  //| 7,2), (8,7), (9,15), (14,10), (15,13))
+  test10.toList sortWith ((n1:(Int,Int),n2:(Int,Int)) => n1._1 == n2._2 )
+                                                  //> res100: List[(Int, Int)] = List((0,3), (14,10), (6,8), (1,6), (9,15), (2,5
+                                                  //| ), (7,2), (4,9), (3,4), (8,7), (15,13))
+  test10.toVector sortWith ((n1:(Int,Int),n2:(Int,Int)) => n1._1 > n2._2 )
+                                                  //> res101: scala.collection.immutable.Vector[(Int, Int)] = Vector((14,10), (9
+                                                  //| ,15), (15,13), (6,8), (8,7), (3,4), (7,2), (0,3), (1,6), (2,5), (4,9))
+  test10.toSeq sortWith ((n1:(Int,Int),n2:(Int,Int)) => n1._1 < n2._2 )
+                                                  //> res102: Seq[(Int, Int)] = ArrayBuffer((2,5), (1,6), (0,3), (7,2), (3,4), (
+                                                  //| 4,9), (6,8), (8,7), (9,15), (14,10), (15,13))
 }

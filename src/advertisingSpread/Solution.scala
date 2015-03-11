@@ -57,7 +57,13 @@ from nodes to all leafs & root
 object Solution {
 
   /*fork is
-   * 1st consequently repeated element (as they sorted)
+   * 1st consequently repeated element 
+   * if input nodes sorted in file 
+   * from lesser to greater & then
+   * fork nodes are on adjusted lines
+   * (so how about useful sorting first ?
+   * def msort[T](xs: List[T])(implicit ord: Ordering) = { ...}
+   * pairArray.sorted - works, but not much helpful) 
    * if non found then root or 1st element in array*/
   def firstFork(
     graph: Vector[ ( Int, Int ) ] ): Int = {
@@ -65,7 +71,7 @@ object Solution {
     /*condition check*/
     //graph.forall { x => ??? }
     val fork = ( for {
-      p <- graph
+      p <- graph //*.sorted
       if /*{
         val currNode = p._1
         val dub1 = graph2.filter { x => x.split(" ")(0).toInt == currNode }
@@ -121,6 +127,7 @@ object Solution {
     } yield elem._2
   } //*work as expected
 
+  /*more verbose and clear*/  
   def treeLeafs1( graph: Vector[ ( Int, Int ) ] ): Vector[ Int ] = {
     for {
       /*Pattern Matching*/
@@ -206,6 +213,39 @@ object Solution {
     }
   } //*works 
 
+  def addRelation( link: ( Int, Int ),
+                   chain: Seq[ Int ] ): Seq[ Int ] = {
+    val ( finish, start1 ) = link
+    //if (chain.tail == start1) {
+    if ( chain.head == start1 ) {
+      /*postfix addition to the right
+                    to create new tail or
+                    for reversed order
+                    ptefix to create new head*/
+      finish +: chain
+    } else {
+      chain
+    }
+  } //*works                                      
+
+  def path( graph: Seq[ ( Int, Int ) ],
+            start: Int ): Seq[ Int ] = graph
+    .foldRight( Seq( start ) )( addRelation ) /*works*/
+
+  def showPath( path1: Seq[ Int ] ): String = path1.mkString( "->" )
+
+  //benchmarking:
+  /*scala.testing.Benchmark trait is
+  predefined in the Scala standard library*/
+  def timeNano[ R ]( block: => R ): R = {
+    val t0 = System.nanoTime()
+    val result = block // call-by-name
+    val t1 = System.nanoTime()
+
+    println( "Elapsed time: " + ( t1 - t0 ) + "ns" )
+    result
+  }
+
   //unit test
   def main( args: Array[ String ] ) {
     val graph2 = Array(
@@ -263,6 +303,7 @@ object Solution {
       /*'readLine' read next string from input*/
       //*val Array( xi, yi ) = for ( i <- graph2( i ) split " " ) yield i.toInt
       //*println("Array(xi, yi) is: (" + xi + ", " + yi + ")")
+      //*pairArray( i ) = (xi, yi)
       pairArray( i ) = currFileLines
         .next()
         .toString()
@@ -286,7 +327,7 @@ object Solution {
     }
 
     //*val testGraph = test2
-    val testGraph: Vector[ ( Int, Int ) ] = pairArray.toVector
+    val testGraph: Vector[ ( Int, Int ) ] = pairArray.sorted.toVector
     //testGraph unzip
     //*val ( nodesSeq, leafsSeq ) = pairArray.unzip
     /*for {
@@ -304,12 +345,41 @@ object Solution {
     } yield curLeaf ).toVector*/ //*works
 
     val leafs = treeLeafs( testGraph )
+    
     //*println( "leafsArray was: " + ( leafsArray mkString "," ) )
     //*val leafs = ( leafsArray filterNot ( _ == -1 ) ).toVector
-    val maxPath = longestPath( testGraph, leafs )
+    //*val maxPath = longestPath( testGraph, leafs )
     val fork = firstFork( testGraph )
-    val minPath = pathToFork( testGraph, leafs, fork, maxPath )
+    //*val minPath = pathToFork( testGraph, leafs, fork, maxPath )
+    
+    //*val pathFold = path( testGraph, leafs.head )
 
+  /*for 'leafs'*/
+  val maxPath: Seq[ Int ] = (
+    for ( leaf <- leafs ) 
+      //*yield path( testGraph, leaf ) 
+      //yield path(pathToRoot( testGraph, leaf ), testGraph.head._1 )
+      //yield path(pathToRoot( testGraph, leaf ), leaf )
+      yield pathToRoot( testGraph, leaf )
+        .foldRight[ Seq[ Int ] ]( Seq() )( _._1 +: _ )//*work
+    )
+    .sortWith( _.size > _.size )//*work
+    //.sortWith( _.size < _.size )
+    .head 
+    
+  val maxPathSize: Int = maxPath.size             
+  val middleNodeIndex: Int = if ( maxPathSize % 2 == 0 ) {
+    maxPathSize / 2
+  } else { ( maxPathSize + 1 ) / 2 } 
+  /*how to get list element by index ?
+  or other data type needed ?*/
+  /*index used as amount of elements*/
+  val ( toMiddleNode, fromMiddleNode ): ( Seq[ Int ], Seq[ Int ] ) =
+    maxPath.splitAt( middleNodeIndex )            
+
+  val minPath: Int = if ( toMiddleNode.size > fromMiddleNode.size )
+    toMiddleNode.size
+  else { fromMiddleNode.size }    
     //val n = readInt
     //*val n = testGraph match {
     //*case Vector() => 0
@@ -323,15 +393,26 @@ object Solution {
     //*println( "fileContent is: " + fileContent.mkString )
     //println( "fileContent first element is: " + fileContent.take(0)/*.mkString*/ )
     println( "total number of relations? / elements in graph is: " + n )
-    println( "testGraph first 7 elements is: " + testGraph.take( 7 ) )
-    println( "minPath is: " + minPath.size )
+    //*println( "testGraph first 7 elements is: " + testGraph.take( 7 ) )
+    /*leafs.foreach {
+      x =>
+        println( "pathFold for leaf " + x +
+          " is: " + showPath( path( testGraph, x ) ) )
+    }*///*works
+    //*println( "pathFold is: " + showPath( pathFold ) )
+    //*println( "minPath is: " + minPath.size )
     println( "minPath is: " + minPath )
-    println( "pairArray is: " + ( pairArray mkString "," ) )
-    println( "leafsArray is: " + ( leafsArray mkString "," ) )
+    /*may be too long & big*/
+    println( "pairArray is: " + ( pairArray.take( 7 ) mkString "," ) )
+    //println( "leafsArray is: " + ( leafsArray mkString "," ) )
     println( "leafs is: " + leafs )
     println( "treeLeafs1(testGraph) is: " + treeLeafs1( testGraph ) )
     println( "fork is: " + fork )
-    println( "maxPath is: " + maxPath )
+    println( "maxPath is: " + (maxPath mkString "->"))
+    /*generic tree view*/
+    //*testGraph.foreach( x => println( showPath( path( testGraph, x._2 ) ) ) )
+    leafs.foreach( x => println( pathToRoot( testGraph, x ) ) ) 
+    
     //println("yield i is: " + i)
     //println("Array(xi, yi) is: " + Array(xi, yi))
     /*println("graph2 is: " + graph2.toString())

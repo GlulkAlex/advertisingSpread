@@ -3,9 +3,9 @@ package advertisingSpread
 import scala.io.Source
 
 object readFromFileTest {
-  val testNumber = 1                              //> testNumber  : Int = 1
+  val testNumber = 10                             //> testNumber  : Int = 10
   val filename = "Test_" + testNumber + "_input.txt"
-                                                  //> filename  : String = Test_1_input.txt
+                                                  //> filename  : String = Test_10_input.txt
   val filePath = "E:\\Java\\coursera-workspace\\Challenge\\"
                                                   //> filePath  : String = E:\Java\coursera-workspace\Challenge\
   val currFile = Source
@@ -22,11 +22,13 @@ object readFromFileTest {
   //} //*works
   val n = if ( currFileLines.hasNext ) {
     currFileLines.next().toInt
-  } else { 0 } //*works                           //> n  : Int = 4
+  } else { 0 } //*works                           //> n  : Int = 13
   val stringArray: Array[ String ] = /*Array()*/
-    new Array[ String ]( n )                      //> stringArray  : Array[String] = Array(null, null, null, null)
+    new Array[ String ]( n )                      //> stringArray  : Array[String] = Array(null, null, null, null, null, null, nul
+                                                  //| l, null, null, null, null, null, null)
   val pairArray: Array[ ( Int, Int ) ] =
-    new Array[ ( Int, Int ) ]( n )                //> pairArray  : Array[(Int, Int)] = Array(null, null, null, null)
+    new Array[ ( Int, Int ) ]( n )                //> pairArray  : Array[(Int, Int)] = Array(null, null, null, null, null, null, n
+                                                  //| ull, null, null, null, null, null, null)
 
   //for (
   //line <- currFileLines
@@ -66,12 +68,23 @@ object readFromFileTest {
 
   println( "stringVector> " + stringVector )      //> stringVector> Vector()
   println( "stringArray> " + stringArray.mkString( "," ) )
-                                                  //> stringArray> null,null,null,null
+                                                  //> stringArray> null,null,null,null,null,null,null,null,null,null,null,null,nu
+                                                  //| ll
+  /*math.Ordering*/
+  pairArray.sorted                                //> res0: Array[(Int, Int)] = Array((0,3), (1,6), (1,14), (2,5), (3,4), (4,9), 
+                                                  //| (6,8), (7,2), (8,7), (9,15), (14,10), (15,1), (15,13))
+  val unsortedVec = pairArray.toVector            //> unsortedVec  : Vector[(Int, Int)] = Vector((6,8), (15,1), (1,14), (0,3), (1
+                                                  //| 5,13), (9,15), (2,5), (14,10), (4,9), (7,2), (8,7), (3,4), (1,6))
+  
+  unsortedVec.sorted                              //> res1: scala.collection.immutable.Vector[(Int, Int)] = Vector((0,3), (1,6), 
+                                                  //| (1,14), (2,5), (3,4), (4,9), (6,8), (7,2), (8,7), (9,15), (14,10), (15,1), 
+                                                  //| (15,13))
   println( "pairArray> " + pairArray.mkString( "," ) )
-                                                  //> pairArray> (0,1),(1,2),(2,3),(2,4)
-  Vector( 1, 2 ) ++ Vector( 3, 4 )                //> res0: scala.collection.immutable.Vector[Int] = Vector(1, 2, 3, 4)
-  1 +: 2 +: Vector( 3, 4 )                        //> res1: scala.collection.immutable.Vector[Int] = Vector(1, 2, 3, 4)
-  Vector( 1, 2 ) :+ 3 :+ 4                        //> res2: scala.collection.immutable.Vector[Int] = Vector(1, 2, 3, 4)
+                                                  //> pairArray> (6,8),(15,1),(1,14),(0,3),(15,13),(9,15),(2,5),(14,10),(4,9),(7,
+                                                  //| 2),(8,7),(3,4),(1,6)
+  Vector( 1, 2 ) ++ Vector( 3, 4 )                //> res2: scala.collection.immutable.Vector[Int] = Vector(1, 2, 3, 4)
+  1 +: 2 +: Vector( 3, 4 )                        //> res3: scala.collection.immutable.Vector[Int] = Vector(1, 2, 3, 4)
+  Vector( 1, 2 ) :+ 3 :+ 4                        //> res4: scala.collection.immutable.Vector[Int] = Vector(1, 2, 3, 4)
   /*constractor object not same as for Arrays
   no Instance Constructors
   new Vector[ (Int, Int) ]( n )*/
@@ -82,12 +95,13 @@ object readFromFileTest {
     case x if x > 0 => positiveArray( x ) = 9
     //*case _          => "not found"
     case x          => x
-  }  //*work                                      //> res3: AnyVal = -1
-  positiveArray                                   //> res4: Array[Int] = Array(1, 3, 5, 7)
-  positiveArray.forall(_ != 3)                    //> res5: Boolean = false
-  positiveArray.forall(_ != -1)                   //> res6: Boolean = true
+  }  //*work                                      //> res5: AnyVal = -1
+  positiveArray                                   //> res6: Array[Int] = Array(1, 3, 5, 7)
+  positiveArray.forall(_ != 3)                    //> res7: Boolean = false
+  positiveArray.forall(_ != -1)                   //> res8: Boolean = true
   
-  val (nodesSeq, leafsSeq) = pairArray.unzip      //> nodesSeq  : Array[Int] = Array(0, 1, 2, 2)
-                                                  //| leafsSeq  : Array[Int] = Array(1, 2, 3, 4)
-  nodesSeq.toSet                                  //> res7: scala.collection.immutable.Set[Int] = Set(0, 1, 2)
+  val (nodesSeq, leafsSeq) = pairArray.unzip      //> nodesSeq  : Array[Int] = Array(6, 15, 1, 0, 15, 9, 2, 14, 4, 7, 8, 3, 1)
+                                                  //| leafsSeq  : Array[Int] = Array(8, 1, 14, 3, 13, 15, 5, 10, 9, 2, 7, 4, 6)
+  nodesSeq.toSet                                  //> res9: scala.collection.immutable.Set[Int] = Set(0, 14, 1, 6, 9, 2, 7, 3, 8,
+                                                  //|  4, 15)
 }
