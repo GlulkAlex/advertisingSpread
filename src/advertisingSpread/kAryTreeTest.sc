@@ -195,7 +195,7 @@ maximum distance from root to leaf == 'tree height' &
 adjasted to (height / 2) node on this path
 */
   1                                               //> res5: Int(1) = 1
-  
+
   abstract class kIntTree {
     /*in 'abstract' class methods allowed without bodies
   or exact method definitions*/
@@ -245,5 +245,175 @@ adjasted to (height / 2) node on this path
     * as it is a single instance of it needed
     */
   1 + 1                                           //> res6: Int(2) = 2
+  def treeF( parent: Option[ Int ], /*exist or not*/
+             /*must be refference to existing tree node
+            as 'treeF' or 'None' or 'treeF.empty'*/
+             value: Int, /*assume it is unique*/
+             children: Option[ List[ Int ] ] /*empty or not*/ ): Map[ Int /*nodeValue*/ , ( Option[ Int ] /*nodeParent*/ , Option[ List[ Int ] ] /*nodeChildren*/ , Int /*nodeHeghit*/ ) ] = {
+      /*'heght' changes when node created (initial value) &
+      when parent changes*/
+      def nodeHeight: Int = parent match {
+        case Some( node ) => node + 1 /*parentHeight + 1*/
+        case None         => 0
+      }
 
+    Map( value ->
+      ( parent,
+        children,
+        nodeHeight ) )
+  }                                               //> treeF: (parent: Option[Int], value: Int, children: Option[List[Int]])Map[In
+                                                  //| t,(Option[Int], Option[List[Int]], Int)]
+
+  def treeF2( parent: Option[ Int ], /*exist or not*/
+              /*must be refference to existing tree node
+            as 'treeF' or 'None' or 'treeF.empty'*/
+              value: Int, /*assume it is unique*/
+              children: Option[ List[ Int ] ] /*empty or not*/ ): ( Option[ Int ] /*nodeParent*/ , Int /*nodeValue*/ , Option[ List[ Int ] ] /*nodeChildren*/ , Int /*nodeHeghit*/ ) = {
+      def nodeHeight: Int = parent match {
+        case Some( node ) => node + 1 /*parentHeight + 1*/
+        case None         => 0
+      }
+
+    (
+      parent,
+      value,
+      children,
+      nodeHeight )
+  }                                               //> treeF2: (parent: Option[Int], value: Int, children: Option[List[Int]])(Opti
+                                                  //| on[Int], Int, Option[List[Int]], Int)
+  /*needed for 'heght' calculation*/
+  def treeF2FindParent( forest: List[ Int ], nodeVal: Int ): Int = ???
+                                                  //> treeF2FindParent: (forest: List[Int], nodeVal: Int)Int
+  /*traversal to find leafs*/
+  def treeF2FindChild( forest: List[ Int ], nodeVal: Int ): Int = ???
+                                                  //> treeF2FindChild: (forest: List[Int], nodeVal: Int)Int
+  /*traversal to get specific node*/
+  def treeF2FindNode( forest: Seq[ ( Option[ Int ], Int, Option[ List[ Int ] ], Int ) ],
+                      nodeVal: Int /*suppose to be unique*/ ): Option[ ( Option[ Int ], Int, Option[ List[ Int ] ], Int ) ] =
+    forest.find( _._2 == nodeVal ) /*works, but   //> treeF2FindNode: (forest: Seq[(Option[Int], Int, Option[List[Int]], Int)], n
+                                                  //| odeVal: Int)Option[(Option[Int], Int, Option[List[Int]], Int)]
+                      doubfuly this is fast solution*/ //.getOrElse(-1)
+  /**may be use curring ?*/
+  def addNode( forest: Seq[ ( Option[ Int ], Int, Option[ List[ Int ] ], Int ) ],
+               node: ( Option[ Int ], Int, Option[ List[ Int ] ], Int ) /*suppose to be unique*/ ): Seq[ ( Option[ Int ], Int, Option[ List[ Int ] ], Int ) ] =
+    treeF2( Option( 15 ), 1, Option( List( 14, 6 ) ) ) +: forest
+                                                  //> addNode: (forest: Seq[(Option[Int], Int, Option[List[Int]], Int)], node: (O
+                                                  //| ption[Int], Int, Option[List[Int]], Int))Seq[(Option[Int], Int, Option[List
+                                                  //| [Int]], Int)]
+
+  /*in / at the monent / current step
+  available / known only
+  ?parent? + value or value + children
+  not parent + value + children
+  so,
+  parent must be found / evaluated before &
+  may be changed with futher import obtained
+  when nessesery*/
+  val node0 = treeF( Option.empty, 0, Option( List( 3 ) ) )
+                                                  //> node0  : Map[Int,(Option[Int], Option[List[Int]], Int)] = Map(0 -> (None,So
+                                                  //| me(List(3)),0))
+  val nodeT0 = treeF2( Option.empty, 0, Option( List( 3 ) ) )
+                                                  //> nodeT0  : (Option[Int], Int, Option[List[Int]], Int) = (None,0,Some(List(3)
+                                                  //| ),0)
+  val node1 = treeF( Option( 0 ), 3, Option( List( 4 ) ) )
+                                                  //> node1  : Map[Int,(Option[Int], Option[List[Int]], Int)] = Map(3 -> (Some(0)
+                                                  //| ,Some(List(4)),1))
+  val nodeT1 = treeF2( Option( 0 ), 3, Option( List( 4 ) ) )
+                                                  //> nodeT1  : (Option[Int], Int, Option[List[Int]], Int) = (Some(0),3,Some(List
+                                                  //| (4)),1)
+  val node2 = treeF( Option( 3 ), 4, Option( List( 9 ) ) )
+                                                  //> node2  : Map[Int,(Option[Int], Option[List[Int]], Int)] = Map(4 -> (Some(3)
+                                                  //| ,Some(List(9)),4))
+  val nodeT2 = treeF2( Option( 3 ), 4, Option( List( 9 ) ) )
+                                                  //> nodeT2  : (Option[Int], Int, Option[List[Int]], Int) = (Some(3),4,Some(List
+                                                  //| (9)),4)
+  val node3 = treeF( Option( 4 ), 9, Option( List( 15 ) ) )
+                                                  //> node3  : Map[Int,(Option[Int], Option[List[Int]], Int)] = Map(9 -> (Some(4)
+                                                  //| ,Some(List(15)),5))
+  val nodeT3 = treeF2( Option( 4 ), 9, Option( List( 15 ) ) )
+                                                  //> nodeT3  : (Option[Int], Int, Option[List[Int]], Int) = (Some(4),9,Some(List
+                                                  //| (15)),5)
+  /*1st fork*/
+  val node4 = treeF( Option( 9 ), 15, Option( List( 1, 13 ) ) )
+                                                  //> node4  : Map[Int,(Option[Int], Option[List[Int]], Int)] = Map(15 -> (Some(9
+                                                  //| ),Some(List(1, 13)),10))
+  val nodeT4 = treeF2( Option( 9 ), 15, Option( List( 1, 13 ) ) )
+                                                  //> nodeT4  : (Option[Int], Int, Option[List[Int]], Int) = (Some(9),15,Some(Lis
+                                                  //| t(1, 13)),10)
+  val sameASnodeT4 = nodeT4                       //> sameASnodeT4  : (Option[Int], Int, Option[List[Int]], Int) = (Some(9),15,So
+                                                  //| me(List(1, 13)),10)
+  sameASnodeT4 == nodeT4                          //> res7: Boolean = true
+  sameASnodeT4 == nodeT3                          //> res8: Boolean = false
+  sameASnodeT4.eq(nodeT4)                         //> res9: Boolean = true
+  sameASnodeT4.eq(nodeT3)                         //> res10: Boolean = false
+  sameASnodeT4.equals(nodeT4)                     //> res11: Boolean = true
+  sameASnodeT4.equals(nodeT3)                     //> res12: Boolean = false
+  sameASnodeT4.canEqual(nodeT4)                   //> res13: Boolean = true
+  sameASnodeT4.canEqual(nodeT3)                   //> res14: Boolean = true
+  //node1.nodeHeight
+  node4.getOrElse( 9, -1 )                        //> res15: Any = -1
+  node4.getOrElse( 15, -2 )                       //> res16: Any = (Some(9),Some(List(1, 13)),10)
+  node4.keys.head                                 //> res17: Int = 15
+  node4.values.head                               //> res18: (Option[Int], Option[List[Int]], Int) = (Some(9),Some(List(1, 13)),
+                                                  //| 10)
+  val ( parent0, nodeVal0, children0, heght0 ) = nodeT4
+                                                  //> parent0  : Option[Int] = Some(9)
+                                                  //| nodeVal0  : Int = 15
+                                                  //| children0  : Option[List[Int]] = Some(List(1, 13))
+                                                  //| heght0  : Int = 10
+  parent0.getOrElse( -1 )                         //> res19: Int = 9
+  val forest0 = Seq( node0, node1, node2, node3, node4, node0 )
+                                                  //> forest0  : Seq[Map[Int,(Option[Int], Option[List[Int]], Int)]] = List(Map(
+                                                  //| 0 -> (None,Some(List(3)),0)), Map(3 -> (Some(0),Some(List(4)),1)), Map(4 -
+                                                  //| > (Some(3),Some(List(9)),4)), Map(9 -> (Some(4),Some(List(15)),5)), Map(15
+                                                  //|  -> (Some(9),Some(List(1, 13)),10)), Map(0 -> (None,Some(List(3)),0)))
+  val forest2 = Seq( nodeT0, nodeT1, nodeT2, nodeT3, nodeT4 , nodeT0)
+                                                  //> forest2  : Seq[(Option[Int], Int, Option[List[Int]], Int)] = List((None,0,
+                                                  //| Some(List(3)),0), (Some(0),3,Some(List(4)),1), (Some(3),4,Some(List(9)),4)
+                                                  //| , (Some(4),9,Some(List(15)),5), (Some(9),15,Some(List(1, 13)),10), (None,0
+                                                  //| ,Some(List(3)),0))
+  
+  forest0.head                                    //> res20: Map[Int,(Option[Int], Option[List[Int]], Int)] = Map(0 -> (None,Som
+                                                  //| e(List(3)),0))
+  forest0.head.hashCode()                         //> res21: Int = -1555808269
+  identity(forest0.head)                          //> res22: Map[Int,(Option[Int], Option[List[Int]], Int)] = Map(0 -> (None,Som
+                                                  //| e(List(3)),0))
+  forest0.last                                    //> res23: Map[Int,(Option[Int], Option[List[Int]], Int)] = Map(0 -> (None,Som
+                                                  //| e(List(3)),0))
+  forest0.last.hashCode()                         //> res24: Int = -1555808269
+  identity(forest0.last)                          //> res25: Map[Int,(Option[Int], Option[List[Int]], Int)] = Map(0 -> (None,Som
+                                                  //| e(List(3)),0))
+  /*from: scalatest.org
+  Checking object identity
+  If you need to
+  check that
+  two references refer to
+  the exact same object,
+  you can write:
+  ref1 should be theSameInstanceAs ref2*/
+  forest0.head == forest0.last                    //> res26: Boolean = true
+  forest0.head eq forest0.last                    //> res27: Boolean = true
+  forest0.head.canEqual(forest0.last)             //> res28: Boolean = true
+  forest0.head.canEqual(forest0.drop(1).head)     //> res29: Boolean = true
+  forest2.head                                    //> res30: (Option[Int], Int, Option[List[Int]], Int) = (None,0,Some(List(3)),
+                                                  //| 0)
+  //forest2.head.isInstanceOf
+  forest2.last                                    //> res31: (Option[Int], Int, Option[List[Int]], Int) = (None,0,Some(List(3)),
+                                                  //| 0)
+  //forest2.last.mkString
+  forest2.drop(1).head                            //> res32: (Option[Int], Int, Option[List[Int]], Int) = (Some(0),3,Some(List(4
+                                                  //| )),1)
+  //forest2.last.isInstanceOf
+  forest2.head equals forest2.last                //> res33: Boolean = true
+  forest2.head eq forest2.last                    //> res34: Boolean = true
+  forest2.head == forest2.last                    //> res35: Boolean = true
+  forest2.head.canEqual(forest2.last)             //> res36: Boolean = true
+  forest2.head.canEqual(forest2.drop(1).head)     //> res37: Boolean = true
+  treeF2( Option( 15 ), 1, Option( List( 14, 6 ) ) ) +: forest2
+                                                  //> res38: Seq[(Option[Int], Int, Option[List[Int]], Int)] = List((Some(15),1,
+                                                  //| Some(List(14, 6)),16), (None,0,Some(List(3)),0), (Some(0),3,Some(List(4)),
+                                                  //| 1), (Some(3),4,Some(List(9)),4), (Some(4),9,Some(List(15)),5), (Some(9),15
+                                                  //| ,Some(List(1, 13)),10), (None,0,Some(List(3)),0))
+  treeF2FindNode( forest2, 15 )                   //> res39: Option[(Option[Int], Int, Option[List[Int]], Int)] = Some((Some(9),
+                                                  //| 15,Some(List(1, 13)),10))
 }
