@@ -128,7 +128,7 @@ object Solution {
     } yield elem._2
   } //*work as expected
 
-  /*more verbose and clear*/  
+  /*more verbose and clear*/
   def treeLeafs1( graph: Vector[ ( Int, Int ) ] ): Vector[ Int ] = {
     for {
       /*Pattern Matching*/
@@ -258,8 +258,9 @@ object Solution {
       "4 6", //end
       "7 8" //end
     ) //min path == 2
-    val lineVecTest =
-      Vector( ( 1, 2 ), ( 2, 3 ), ( 3, 4 ), ( 4, 5 ), ( 5, 6 ), ( 6, 7 ), ( 7, 8 ) ) //min path == 4 = 7 / 2 + 1
+    val lineVecTest = Vector(
+      ( 1, 2 ), ( 2, 3 ), ( 3, 4 ),
+      ( 4, 5 ), ( 5, 6 ), ( 6, 7 ), ( 7, 8 ) ) //min path == 4 = 7 / 2 + 1
     val test1 = Vector( ( 0, 1 ),
       ( 1, 2 ),
       ( 2, 3 ),
@@ -288,6 +289,7 @@ object Solution {
     } else { 0 } //*works
     val fileContent: Iterator[ String ] = Iterator()
     //val testGraph: Vector[ ( Int, Int ) ] = Vector()
+    /*size known upfront*/
     val pairArray: Array[ ( Int, Int ) ] =
       new Array[ ( Int, Int ) ]( n )
     val leafsArray = new Array[ Int ]( n )
@@ -346,41 +348,41 @@ object Solution {
     } yield curLeaf ).toVector*/ //*works
 
     val leafs = treeLeafs( testGraph )
-    
+
     //*println( "leafsArray was: " + ( leafsArray mkString "," ) )
     //*val leafs = ( leafsArray filterNot ( _ == -1 ) ).toVector
     //*val maxPath = longestPath( testGraph, leafs )
     val fork = firstFork( testGraph )
     //*val minPath = pathToFork( testGraph, leafs, fork, maxPath )
-    
+
     //*val pathFold = path( testGraph, leafs.head )
 
-  /*for 'leafs'*/
-  val maxPath: Seq[ Int ] = (
-    for ( leaf <- leafs ) 
-      //*yield path( testGraph, leaf ) 
-      //yield path(pathToRoot( testGraph, leaf ), testGraph.head._1 )
-      //yield path(pathToRoot( testGraph, leaf ), leaf )
-      yield pathToRoot( testGraph, leaf )
-        .foldRight[ Seq[ Int ] ]( Seq() )( _._1 +: _ )//*work
+    /*for 'leafs'*/
+    val maxPath: Seq[ Int ] = (
+      for ( leaf <- leafs )
+        //*yield path( testGraph, leaf ) 
+        //yield path(pathToRoot( testGraph, leaf ), testGraph.head._1 )
+        //yield path(pathToRoot( testGraph, leaf ), leaf )
+        yield pathToRoot( testGraph, leaf )
+        .foldRight[ Seq[ Int ] ]( Seq() )( _._1 +: _ ) //*work
     )
-    .sortWith( _.size > _.size )//*work
-    //.sortWith( _.size < _.size )
-    .head 
-    
-  val maxPathSize: Int = maxPath.size             
-  val middleNodeIndex: Int = if ( maxPathSize % 2 == 0 ) {
-    maxPathSize / 2
-  } else { ( maxPathSize + 1 ) / 2 } 
-  /*how to get list element by index ?
-  or other data type needed ?*/
-  /*index used as amount of elements*/
-  val ( toMiddleNode, fromMiddleNode ): ( Seq[ Int ], Seq[ Int ] ) =
-    maxPath.splitAt( middleNodeIndex )            
+      .sortWith( _.size > _.size ) //*work
+      //.sortWith( _.size < _.size )
+      .head
 
-  val minPath: Int = if ( toMiddleNode.size > fromMiddleNode.size )
-    toMiddleNode.size
-  else { fromMiddleNode.size }    
+    val maxPathSize: Int = maxPath.size
+    val middleNodeIndex: Int = if ( maxPathSize % 2 == 0 ) {
+      maxPathSize / 2
+    } else { ( maxPathSize + 1 ) / 2 }
+    /*how to get list element by index ?
+  or other data type needed ?*/
+    /*index used as amount of elements*/
+    val ( toMiddleNode, fromMiddleNode ): ( Seq[ Int ], Seq[ Int ] ) =
+      maxPath
+        .splitAt( middleNodeIndex )
+    val minPath: Int = if ( toMiddleNode.size > fromMiddleNode.size ) {
+      toMiddleNode.size
+    } else { fromMiddleNode.size }
     //val n = readInt
     //*val n = testGraph match {
     //*case Vector() => 0
@@ -399,21 +401,22 @@ object Solution {
       x =>
         println( "pathFold for leaf " + x +
           " is: " + showPath( path( testGraph, x ) ) )
-    }*///*works
+    }*/ //*works
     //*println( "pathFold is: " + showPath( pathFold ) )
     //*println( "minPath is: " + minPath.size )
-    println( "minPath is: " + minPath )
+    //*println( "minPath is: " + minPath )
     /*may be too long & big*/
     println( "pairArray is: " + ( pairArray.take( 7 ) mkString "," ) )
-    //println( "leafsArray is: " + ( leafsArray mkString "," ) )
-    println( "leafs is: " + leafs )
-    println( "treeLeafs1(testGraph) is: " + treeLeafs1( testGraph ) )
-    println( "fork is: " + fork )
-    println( "maxPath is: " + (maxPath mkString "->"))
+    //*println( "leafsArray is: " + ( leafsArray mkString "," ) )
+    //*println( "leafs is: " + leafs )
+    //*println( "treeLeafs1(testGraph) is: " + treeLeafs1( testGraph ) )
+    //*println( "fork is: " + fork )
+    println( "maxPath is: " + ( maxPath mkString "->" ) )
     /*generic tree view*/
     //*testGraph.foreach( x => println( showPath( path( testGraph, x._2 ) ) ) )
-    leafs.foreach( x => println( pathToRoot( testGraph, x ) ) ) 
-    
+    /*leafs
+      .foreach( x => println( pathToRoot( testGraph, x ) ) )*/
+
     //println("yield i is: " + i)
     //println("Array(xi, yi) is: " + Array(xi, yi))
     /*println("graph2 is: " + graph2.toString())

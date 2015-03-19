@@ -1,7 +1,8 @@
 package advertisingSpread
 
 object testMap {
-  /*relative to root*/
+  /*relative to root or
+  parent node*/
   def nodeHeight( treeMap: Map[ Int, Int ],
                   node: Int,
                   currentHeight: Int = -1 ): Int = treeMap get node match {
@@ -17,8 +18,9 @@ object testMap {
       case somePath => pathToRoot( treeMap, result, result +: somePath )
     }
     case None | Some( -1 ) => currentPath
-  } /*work, but nod itself not includet in result //> pathToRoot: (treeMap: Map[Int,Int], node: Int, currentPath: Seq[Int])Seq[Int
+  } /*work, but                                   //> pathToRoot: (treeMap: Map[Int,Int], node: Int, currentPath: Seq[Int])Seq[Int
                                                   //| ]
+  node itself not includet in result
   as it is 'key' not 'value'*/
 
   /*all duplicates, except one last common in both path
@@ -183,6 +185,7 @@ object testMap {
   ( path5 ++ path10 ).toSet.mkString( "->" )      //> res34: String = 0->5->10->14->1->6->9->2->7->3->8->4->15
   path5.companion                                 //> res35: scala.collection.generic.GenericCompanion[Seq] = scala.collection.im
                                                   //| mutable.List$@144fc21
+  /*same as 'mergePath'*/
   val seqIntersect = path5.intersect( path10 )    //> seqIntersect  : Seq[Int] = List(0, 3, 4, 9, 15, 1)
   path10.intersect( path5 )                       //> res36: Seq[Int] = List(0, 3, 4, 9, 15, 1)
   val seqDiff_1From2 = path5.diff( path10 )       //> seqDiff_1From2  : Seq[Int] = List(6, 8, 7, 2, 5)

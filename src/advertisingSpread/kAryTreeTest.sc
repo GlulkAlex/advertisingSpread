@@ -194,8 +194,6 @@ largest / 'maximum path' from leaf to root or
 maximum distance from root to leaf == 'tree height' &
 adjasted to (height / 2) node on this path
 */
-  1                                               //> res5: Int(1) = 1
-
   abstract class kIntTree {
     /*in 'abstract' class methods allowed without bodies
   or exact method definitions*/
@@ -244,7 +242,7 @@ adjasted to (height / 2) node on this path
   /** refactor 'Nil' as object
     * as it is a single instance of it needed
     */
-  1 + 1                                           //> res6: Int(2) = 2
+  1 + 1                                           //> res5: Int(2) = 2
   def treeF( parent: Option[ Int ], /*exist or not*/
              /*must be refference to existing tree node
             as 'treeF' or 'None' or 'treeF.empty'*/
@@ -342,26 +340,26 @@ adjasted to (height / 2) node on this path
                                                   //| t(1, 13)),10)
   val sameASnodeT4 = nodeT4                       //> sameASnodeT4  : (Option[Int], Int, Option[List[Int]], Int) = (Some(9),15,So
                                                   //| me(List(1, 13)),10)
-  sameASnodeT4 == nodeT4                          //> res7: Boolean = true
-  sameASnodeT4 == nodeT3                          //> res8: Boolean = false
-  sameASnodeT4.eq(nodeT4)                         //> res9: Boolean = true
-  sameASnodeT4.eq(nodeT3)                         //> res10: Boolean = false
-  sameASnodeT4.equals(nodeT4)                     //> res11: Boolean = true
-  sameASnodeT4.equals(nodeT3)                     //> res12: Boolean = false
-  sameASnodeT4.canEqual(nodeT4)                   //> res13: Boolean = true
-  sameASnodeT4.canEqual(nodeT3)                   //> res14: Boolean = true
+  sameASnodeT4 == nodeT4                          //> res6: Boolean = true
+  sameASnodeT4 == nodeT3                          //> res7: Boolean = false
+  sameASnodeT4.eq(nodeT4)                         //> res8: Boolean = true
+  sameASnodeT4.eq(nodeT3)                         //> res9: Boolean = false
+  sameASnodeT4.equals(nodeT4)                     //> res10: Boolean = true
+  sameASnodeT4.equals(nodeT3)                     //> res11: Boolean = false
+  sameASnodeT4.canEqual(nodeT4)                   //> res12: Boolean = true
+  sameASnodeT4.canEqual(nodeT3)                   //> res13: Boolean = true
   //node1.nodeHeight
-  node4.getOrElse( 9, -1 )                        //> res15: Any = -1
-  node4.getOrElse( 15, -2 )                       //> res16: Any = (Some(9),Some(List(1, 13)),10)
-  node4.keys.head                                 //> res17: Int = 15
-  node4.values.head                               //> res18: (Option[Int], Option[List[Int]], Int) = (Some(9),Some(List(1, 13)),
+  node4.getOrElse( 9, -1 )                        //> res14: Any = -1
+  node4.getOrElse( 15, -2 )                       //> res15: Any = (Some(9),Some(List(1, 13)),10)
+  node4.keys.head                                 //> res16: Int = 15
+  node4.values.head                               //> res17: (Option[Int], Option[List[Int]], Int) = (Some(9),Some(List(1, 13)),
                                                   //| 10)
   val ( parent0, nodeVal0, children0, heght0 ) = nodeT4
                                                   //> parent0  : Option[Int] = Some(9)
                                                   //| nodeVal0  : Int = 15
                                                   //| children0  : Option[List[Int]] = Some(List(1, 13))
                                                   //| heght0  : Int = 10
-  parent0.getOrElse( -1 )                         //> res19: Int = 9
+  parent0.getOrElse( -1 )                         //> res18: Int = 9
   val forest0 = Seq( node0, node1, node2, node3, node4, node0 )
                                                   //> forest0  : Seq[Map[Int,(Option[Int], Option[List[Int]], Int)]] = List(Map(
                                                   //| 0 -> (None,Some(List(3)),0)), Map(3 -> (Some(0),Some(List(4)),1)), Map(4 -
@@ -373,15 +371,15 @@ adjasted to (height / 2) node on this path
                                                   //| , (Some(4),9,Some(List(15)),5), (Some(9),15,Some(List(1, 13)),10), (None,0
                                                   //| ,Some(List(3)),0))
   
-  forest0.head                                    //> res20: Map[Int,(Option[Int], Option[List[Int]], Int)] = Map(0 -> (None,Som
+  forest0.head                                    //> res19: Map[Int,(Option[Int], Option[List[Int]], Int)] = Map(0 -> (None,Som
                                                   //| e(List(3)),0))
-  forest0.head.hashCode()                         //> res21: Int = -1555808269
-  identity(forest0.head)                          //> res22: Map[Int,(Option[Int], Option[List[Int]], Int)] = Map(0 -> (None,Som
+  forest0.head.hashCode()                         //> res20: Int = -1555808269
+  identity(forest0.head)                          //> res21: Map[Int,(Option[Int], Option[List[Int]], Int)] = Map(0 -> (None,Som
                                                   //| e(List(3)),0))
-  forest0.last                                    //> res23: Map[Int,(Option[Int], Option[List[Int]], Int)] = Map(0 -> (None,Som
+  forest0.last                                    //> res22: Map[Int,(Option[Int], Option[List[Int]], Int)] = Map(0 -> (None,Som
                                                   //| e(List(3)),0))
-  forest0.last.hashCode()                         //> res24: Int = -1555808269
-  identity(forest0.last)                          //> res25: Map[Int,(Option[Int], Option[List[Int]], Int)] = Map(0 -> (None,Som
+  forest0.last.hashCode()                         //> res23: Int = -1555808269
+  identity(forest0.last)                          //> res24: Map[Int,(Option[Int], Option[List[Int]], Int)] = Map(0 -> (None,Som
                                                   //| e(List(3)),0))
   /*from: scalatest.org
   Checking object identity
@@ -391,29 +389,29 @@ adjasted to (height / 2) node on this path
   the exact same object,
   you can write:
   ref1 should be theSameInstanceAs ref2*/
-  forest0.head == forest0.last                    //> res26: Boolean = true
-  forest0.head eq forest0.last                    //> res27: Boolean = true
-  forest0.head.canEqual(forest0.last)             //> res28: Boolean = true
-  forest0.head.canEqual(forest0.drop(1).head)     //> res29: Boolean = true
-  forest2.head                                    //> res30: (Option[Int], Int, Option[List[Int]], Int) = (None,0,Some(List(3)),
+  forest0.head == forest0.last                    //> res25: Boolean = true
+  forest0.head eq forest0.last                    //> res26: Boolean = true
+  forest0.head.canEqual(forest0.last)             //> res27: Boolean = true
+  forest0.head.canEqual(forest0.drop(1).head)     //> res28: Boolean = true
+  forest2.head                                    //> res29: (Option[Int], Int, Option[List[Int]], Int) = (None,0,Some(List(3)),
                                                   //| 0)
   //forest2.head.isInstanceOf
-  forest2.last                                    //> res31: (Option[Int], Int, Option[List[Int]], Int) = (None,0,Some(List(3)),
+  forest2.last                                    //> res30: (Option[Int], Int, Option[List[Int]], Int) = (None,0,Some(List(3)),
                                                   //| 0)
   //forest2.last.mkString
-  forest2.drop(1).head                            //> res32: (Option[Int], Int, Option[List[Int]], Int) = (Some(0),3,Some(List(4
+  forest2.drop(1).head                            //> res31: (Option[Int], Int, Option[List[Int]], Int) = (Some(0),3,Some(List(4
                                                   //| )),1)
   //forest2.last.isInstanceOf
-  forest2.head equals forest2.last                //> res33: Boolean = true
-  forest2.head eq forest2.last                    //> res34: Boolean = true
-  forest2.head == forest2.last                    //> res35: Boolean = true
-  forest2.head.canEqual(forest2.last)             //> res36: Boolean = true
-  forest2.head.canEqual(forest2.drop(1).head)     //> res37: Boolean = true
+  forest2.head equals forest2.last                //> res32: Boolean = true
+  forest2.head eq forest2.last                    //> res33: Boolean = true
+  forest2.head == forest2.last                    //> res34: Boolean = true
+  forest2.head.canEqual(forest2.last)             //> res35: Boolean = true
+  forest2.head.canEqual(forest2.drop(1).head)     //> res36: Boolean = true
   treeF2( Option( 15 ), 1, Option( List( 14, 6 ) ) ) +: forest2
-                                                  //> res38: Seq[(Option[Int], Int, Option[List[Int]], Int)] = List((Some(15),1,
+                                                  //> res37: Seq[(Option[Int], Int, Option[List[Int]], Int)] = List((Some(15),1,
                                                   //| Some(List(14, 6)),16), (None,0,Some(List(3)),0), (Some(0),3,Some(List(4)),
                                                   //| 1), (Some(3),4,Some(List(9)),4), (Some(4),9,Some(List(15)),5), (Some(9),15
                                                   //| ,Some(List(1, 13)),10), (None,0,Some(List(3)),0))
-  treeF2FindNode( forest2, 15 )                   //> res39: Option[(Option[Int], Int, Option[List[Int]], Int)] = Some((Some(9),
+  treeF2FindNode( forest2, 15 )                   //> res38: Option[(Option[Int], Int, Option[List[Int]], Int)] = Some((Some(9),
                                                   //| 15,Some(List(1, 13)),10))
 }
