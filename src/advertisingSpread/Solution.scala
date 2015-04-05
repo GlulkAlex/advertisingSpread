@@ -6,6 +6,16 @@ import math._
 //import scala.io.StdIn.readLine
 import scala.io.Source
 
+/*some implementation of 
+ * data structure,
+ * Prim's algorithm (lazy & Eager approach, priority queue),
+ * Kruskal's algorithm (priority queue)
+ * from:
+ * http://algs4.cs.princeton.edu/43mst/ 
+ * */
+/**? the 'minimax path' problem ?*/
+/*or*/
+/**? 'minimum spanning tree' ?*/
 /*description:
 codingame.com Sponsored Challenge from Teads
 Goal:
@@ -52,9 +62,12 @@ from nodes to all leafs & root
 * (Scala arrays are 
 * native JVM arrays at runtime, therefore 
 * they are very performant)*/
-/* possble use of '.toSet' to
+/* possible use of '.toSet' to
  * eliminate duplicates or 'distinct' Operation on sequences    
  * */
+/**Assumption:
+ * input graph connected
+ * all vertices / nodes reachable from each other*/
 object Solution {
 
   /*fork is
@@ -66,6 +79,14 @@ object Solution {
    * def msort[T](xs: List[T])(implicit ord: Ordering) = { ...}
    * pairArray.sorted - works, but not much helpful) 
    * if non found then root or 1st element in array*/
+  /**When an 'edge' connects two 'vertices', 
+   * we say that 
+   * the 'vertices' are 'adjacent' to one another and 
+   * that the 'edge' is 'incident on' both 'vertices'.
+   * 
+   * The 'degree' of a vertex is 
+   * the number of 'edges' 'incident on' it.
+   * */
   def firstFork(
     graph: Vector[ ( Int, Int ) ] ): Int = {
     //graph.foreach { x => print(x + ',') }
@@ -84,7 +105,43 @@ object Solution {
       if ( graph.size > 0 ) { graph.head._1 } else { -1 }
     }
   }
-
+  /**A 'path' in a graph is 
+   * a 'sequence of vertices' connected by 'edges'. 
+   * A 'simple path' is 
+   * one with no repeated 'vertices'.
+   * 
+   * The 'length' of a 'path' or 
+   * a 'cycle' is 
+   * its number of 'edges'.
+   * 
+   * We say that 
+   * one vertex is 'connected' to another if 
+   * there exists a 'path' that contains both of them.
+   * 
+   * A graph is 'connected' if 
+   * there is a 'path' from every 'vertex' to every other 'vertex'.
+   * 
+   * A 'graph' that is not connected consists of 
+   * a set of 'connected components', which are 
+   * maximal 'connected subgraphs'.
+   * 
+   * An 'acyclic graph' is 
+   * a 'graph' with no 'cycles'.
+   * 
+   * A 'tree' is an 'acyclic connected graph'.
+   * 
+   * A 'forest' is 
+   * a 'disjoint set' of 'trees'.
+   * 
+   * A 'spanning tree' of 
+   * a 'connected graph' is 
+   * a 'subgraph' that 
+   * contains all of that graph's 'vertices' and 
+   * is a 'single tree'. 
+   * A 'spanning forest' of a 'graph' is 
+   * the 'union' of 
+   * the 'spanning trees' of its 'connected components'.
+   * */
   def pathToRoot(
     graph: Vector[ ( Int, Int ) ],
     fromLeaf: Int,

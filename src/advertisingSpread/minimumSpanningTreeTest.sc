@@ -14,7 +14,10 @@ object minimumSpanningTreeTest {
               /*must be refference to existing tree node
             as 'treeF' or 'None' or 'treeF.empty'*/
               value: Int, /*assume it is unique*/
-              children: Option[ List[ Int ] ] /*empty or not*/ ): ( Option[ Int ] /*nodeParent*/ , Int /*nodeValue*/ , Option[ List[ Int ] ] /*nodeChildren*/ , Int /*nodeHeghit*/ ) = {
+              children: Option[ List[ Int ] ] /*empty or not*/ ): ( Option[ Int ] /*nodeParent*/ ,
+              Int /*nodeValue*/ ,
+              Option[ List[ Int ] ] /*nodeChildren*/ ,
+              Int /*nodeHeghit*/ ) = {
       def nodeHeight: Int = parent match {
         case Some( node ) => node + 1 /*parentHeight + 1*/
         case None         => 0
@@ -36,10 +39,12 @@ object minimumSpanningTreeTest {
                       nodeVal: Int /*suppose to be unique*/ ): Option[ ( Option[ Int ], Int, Option[ List[ Int ] ], Int ) ] =
     forest.find( _._2 == nodeVal ) /*works, but
                       doubfuly this is fast solution*/ //.getOrElse(-1)
+                      
   /**may be use curring ?*/
   def addNode( forest: Seq[ ( Option[ Int ], Int, Option[ List[ Int ] ], Int ) ],
                node: ( Option[ Int ], Int, Option[ List[ Int ] ], Int ) /*suppose to be unique*/ ): Seq[ ( Option[ Int ], Int, Option[ List[ Int ] ], Int ) ] =
     treeF2( Option( 15 ), 1, Option( List( 14, 6 ) ) ) +: forest
+    
   /*? is any parameters needed ?*/
   /** too complex &
     * I do not know what to do with this right now
@@ -74,20 +79,6 @@ object minimumSpanningTreeTest {
                        value: Int,
                        children: Option[ List[ Int ] ],
                        height: Int )
-
-  /*? how about reccursion ?
-  & How that can be possibly used ?*/
-  case class SubTree( parent: Option[ SubTree ],
-                      value: Int,
-                      children: List[ SubTree ] ,/*List.empty or .isDefined*/
-                      height: Int /*evaluated value
-                      so, must be method
-                      as value expected to be updated
-                      when three structure changes or
-                      nodes be sorted / properly ordered*/)
-                      
-  /*for childern manipulation?*/
-  case class ForestOfTrees( trees: List[ SubTree ]  )
 
   /*add link to chain when node with current value has parent*/
   def addStep( link: TreeNode, /*parent->child or node->leaf*/
@@ -128,7 +119,7 @@ object minimumSpanningTreeTest {
     * @param startIndex - from which node or leaf in tree build a path
     * @return sequence on connected tree nodes as path
     */
-  def path0( graph: /*Array*/ Seq[ TreeNode ], /*'Seq' if has 'head'->'tail' chain*/
+  def path_v0( graph: /*Array*/ Seq[ TreeNode ], /*'Seq' if has 'head'->'tail' chain*/
              /*node value*/
              startIndex: Int ): Seq[ Int ] = graph
     /*traversal direction -> up to root*/
@@ -168,7 +159,8 @@ object minimumSpanningTreeTest {
         so
         root*/
             case Some( children ) if ( !children.contains( nodeValue ) ) => {
-              addChild( nodeValue, Index )
+            /*forward reference extends over definition
+              addChild( nodeValue, Index )*/
             }
             /*case Some( children ) if ( children.contains( nodeValue ) ) => {
           /*skip & do nothing for now*/
@@ -216,29 +208,6 @@ object minimumSpanningTreeTest {
     TreeNode( Option( 14 ), 10, Option.empty, 7 ),
     TreeNode( Option( 2 ), 5, Option.empty, 10 )
   )
-
-
-  val fakeRoot = SubTree(
-    Option.empty,
-    -1,
-    List.empty,
-    -1)
-      /*subTree( Option( subTree() ), 3, Option( List(
-        subTree( Option( subTree ), 4, Option.empty, 2 )
-      ) ), 1 )
-    ) ), 0 )*/ /*,
-    TreeNode( Option( 4 ), 9, Option( List( 15 ) ), 3 ),
-    TreeNode( Option( 9 ), 15, Option( List( 1, 13 ) ), 4 ),
-    TreeNode( Option( 15 ), 13, Option.empty, 5 ),
-    TreeNode( Option( 15 ), 1, Option( List( 6, 14 ) ), 5 ),
-    TreeNode( Option( 1 ), 14, Option( List( 10 ) ), 6 ),
-    TreeNode( Option( 14 ), 10, Option.empty, 7 ),
-    TreeNode( Option( 1 ), 6, Option( List( 8 ) ), 6 ),
-    TreeNode( Option( 6 ), 8, Option( List( 7 ) ), 7 ),
-    TreeNode( Option( 8 ), 7, Option( List( 2 ) ), 8 ),
-    TreeNode( Option( 7 ), 2, Option( List( 5 ) ), 9 ),
-    TreeNode( Option( 2 ), 5, Option.empty, 10 )*/
-  /*)*/
 
   tree1
     //.view/*= SeqViewF(...)*/
@@ -355,6 +324,7 @@ object minimumSpanningTreeTest {
   val path0 = path( tree1, 0 )
   val path10 = path( tree1, 10 )
   val path13 = path( tree1, 13 )
+  
   mergePath( path1, path9 )
   /*java.util.NoSuchElementException
   when Array unsorted*/

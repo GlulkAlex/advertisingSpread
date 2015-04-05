@@ -1,6 +1,20 @@
 package advertisingSpread
 
 object kAryTreeTest {
+	/*possible Graph Representations:
+	1. The Adjacency Matrix
+	2. Adjacency Lists
+	
+	Ingredients:
+	>  array (or list) of vertices
+	>  array (or list) of edges
+	>  each edge points to its endpoints
+	>  each vertex points to
+	   edges incident on (resulting from) it
+	
+	Note:
+	! edge-to-vertex 'one-to-one' correspondence !*/
+ 
   /*In graph theory,
   a 'k-ary' tree is
   a rooted tree in which
@@ -120,11 +134,24 @@ object kAryTreeTest {
     exactly 'one parent', and
     the 'root' must have 'no parents'.
   */
+/*Arborescence (graph theory)
+From Wikipedia, the free encyclopedia
+
+Tree (graph theory).
+In graph theory,
+an 'arborescence' is
+a 'directed graph' in which,
+for a 'vertex' 'u' called the 'root' and any other vertex 'v',
+there is
+exactly one 'directed path' from 'u' to 'v'.
+An 'arborescence' is thus
+the 'directed-graph' form of a 'rooted tree',
+understood here as an undirected graph.*/
 
   /*restrictions:
-no duplicate(ed) values
-if exist / contains then
-stay the same, no / without change*/
+	no duplicate(ed) values
+	if exist / contains then
+	stay the same, no / without change*/
   /**Samples:*/
   /*empty tree*/
   "(Nil){Nil;-1}[Empty]"                          //> res0: String("(Nil){Nil;-1}[Empty]") = (Nil){Nil;-1}[Empty]
@@ -242,7 +269,6 @@ adjasted to (height / 2) node on this path
   /** refactor 'Nil' as object
     * as it is a single instance of it needed
     */
-  1 + 1                                           //> res5: Int(2) = 2
   def treeF( parent: Option[ Int ], /*exist or not*/
              /*must be refference to existing tree node
             as 'treeF' or 'None' or 'treeF.empty'*/
@@ -311,75 +337,75 @@ adjasted to (height / 2) node on this path
                                                   //> node0  : Map[Int,(Option[Int], Option[List[Int]], Int)] = Map(0 -> (None,So
                                                   //| me(List(3)),0))
   val nodeT0 = treeF2( Option.empty, 0, Option( List( 3 ) ) )
-                                                  //> nodeT0  : (Option[Int], Int, Option[List[Int]], Int) = (None,0,Some(List(3)
-                                                  //| ),0)
+                                                  //> nodeT0  : (Option[Int], Int, Option[List[Int]], Int) = (None,0,Some(List(3
+                                                  //| )),0)
   val node1 = treeF( Option( 0 ), 3, Option( List( 4 ) ) )
-                                                  //> node1  : Map[Int,(Option[Int], Option[List[Int]], Int)] = Map(3 -> (Some(0)
-                                                  //| ,Some(List(4)),1))
+                                                  //> node1  : Map[Int,(Option[Int], Option[List[Int]], Int)] = Map(3 -> (Some(0
+                                                  //| ),Some(List(4)),1))
   val nodeT1 = treeF2( Option( 0 ), 3, Option( List( 4 ) ) )
-                                                  //> nodeT1  : (Option[Int], Int, Option[List[Int]], Int) = (Some(0),3,Some(List
-                                                  //| (4)),1)
+                                                  //> nodeT1  : (Option[Int], Int, Option[List[Int]], Int) = (Some(0),3,Some(Lis
+                                                  //| t(4)),1)
   val node2 = treeF( Option( 3 ), 4, Option( List( 9 ) ) )
-                                                  //> node2  : Map[Int,(Option[Int], Option[List[Int]], Int)] = Map(4 -> (Some(3)
-                                                  //| ,Some(List(9)),4))
+                                                  //> node2  : Map[Int,(Option[Int], Option[List[Int]], Int)] = Map(4 -> (Some(3
+                                                  //| ),Some(List(9)),4))
   val nodeT2 = treeF2( Option( 3 ), 4, Option( List( 9 ) ) )
-                                                  //> nodeT2  : (Option[Int], Int, Option[List[Int]], Int) = (Some(3),4,Some(List
-                                                  //| (9)),4)
+                                                  //> nodeT2  : (Option[Int], Int, Option[List[Int]], Int) = (Some(3),4,Some(Lis
+                                                  //| t(9)),4)
   val node3 = treeF( Option( 4 ), 9, Option( List( 15 ) ) )
-                                                  //> node3  : Map[Int,(Option[Int], Option[List[Int]], Int)] = Map(9 -> (Some(4)
-                                                  //| ,Some(List(15)),5))
+                                                  //> node3  : Map[Int,(Option[Int], Option[List[Int]], Int)] = Map(9 -> (Some(4
+                                                  //| ),Some(List(15)),5))
   val nodeT3 = treeF2( Option( 4 ), 9, Option( List( 15 ) ) )
-                                                  //> nodeT3  : (Option[Int], Int, Option[List[Int]], Int) = (Some(4),9,Some(List
-                                                  //| (15)),5)
+                                                  //> nodeT3  : (Option[Int], Int, Option[List[Int]], Int) = (Some(4),9,Some(Lis
+                                                  //| t(15)),5)
   /*1st fork*/
   val node4 = treeF( Option( 9 ), 15, Option( List( 1, 13 ) ) )
-                                                  //> node4  : Map[Int,(Option[Int], Option[List[Int]], Int)] = Map(15 -> (Some(9
-                                                  //| ),Some(List(1, 13)),10))
+                                                  //> node4  : Map[Int,(Option[Int], Option[List[Int]], Int)] = Map(15 -> (Some(
+                                                  //| 9),Some(List(1, 13)),10))
   val nodeT4 = treeF2( Option( 9 ), 15, Option( List( 1, 13 ) ) )
-                                                  //> nodeT4  : (Option[Int], Int, Option[List[Int]], Int) = (Some(9),15,Some(Lis
-                                                  //| t(1, 13)),10)
-  val sameASnodeT4 = nodeT4                       //> sameASnodeT4  : (Option[Int], Int, Option[List[Int]], Int) = (Some(9),15,So
-                                                  //| me(List(1, 13)),10)
-  sameASnodeT4 == nodeT4                          //> res6: Boolean = true
-  sameASnodeT4 == nodeT3                          //> res7: Boolean = false
-  sameASnodeT4.eq(nodeT4)                         //> res8: Boolean = true
-  sameASnodeT4.eq(nodeT3)                         //> res9: Boolean = false
-  sameASnodeT4.equals(nodeT4)                     //> res10: Boolean = true
-  sameASnodeT4.equals(nodeT3)                     //> res11: Boolean = false
-  sameASnodeT4.canEqual(nodeT4)                   //> res12: Boolean = true
-  sameASnodeT4.canEqual(nodeT3)                   //> res13: Boolean = true
+                                                  //> nodeT4  : (Option[Int], Int, Option[List[Int]], Int) = (Some(9),15,Some(Li
+                                                  //| st(1, 13)),10)
+  val sameASnodeT4 = nodeT4                       //> sameASnodeT4  : (Option[Int], Int, Option[List[Int]], Int) = (Some(9),15,S
+                                                  //| ome(List(1, 13)),10)
+  sameASnodeT4 == nodeT4                          //> res5: Boolean = true
+  sameASnodeT4 == nodeT3                          //> res6: Boolean = false
+  sameASnodeT4.eq( nodeT4 )                       //> res7: Boolean = true
+  sameASnodeT4.eq( nodeT3 )                       //> res8: Boolean = false
+  sameASnodeT4.equals( nodeT4 )                   //> res9: Boolean = true
+  sameASnodeT4.equals( nodeT3 )                   //> res10: Boolean = false
+  sameASnodeT4.canEqual( nodeT4 )                 //> res11: Boolean = true
+  sameASnodeT4.canEqual( nodeT3 )                 //> res12: Boolean = true
   //node1.nodeHeight
-  node4.getOrElse( 9, -1 )                        //> res14: Any = -1
-  node4.getOrElse( 15, -2 )                       //> res15: Any = (Some(9),Some(List(1, 13)),10)
-  node4.keys.head                                 //> res16: Int = 15
-  node4.values.head                               //> res17: (Option[Int], Option[List[Int]], Int) = (Some(9),Some(List(1, 13)),
+  node4.getOrElse( 9, -1 )                        //> res13: Any = -1
+  node4.getOrElse( 15, -2 )                       //> res14: Any = (Some(9),Some(List(1, 13)),10)
+  node4.keys.head                                 //> res15: Int = 15
+  node4.values.head                               //> res16: (Option[Int], Option[List[Int]], Int) = (Some(9),Some(List(1, 13)),
                                                   //| 10)
   val ( parent0, nodeVal0, children0, heght0 ) = nodeT4
                                                   //> parent0  : Option[Int] = Some(9)
                                                   //| nodeVal0  : Int = 15
                                                   //| children0  : Option[List[Int]] = Some(List(1, 13))
                                                   //| heght0  : Int = 10
-  parent0.getOrElse( -1 )                         //> res18: Int = 9
+  parent0.getOrElse( -1 )                         //> res17: Int = 9
   val forest0 = Seq( node0, node1, node2, node3, node4, node0 )
                                                   //> forest0  : Seq[Map[Int,(Option[Int], Option[List[Int]], Int)]] = List(Map(
                                                   //| 0 -> (None,Some(List(3)),0)), Map(3 -> (Some(0),Some(List(4)),1)), Map(4 -
                                                   //| > (Some(3),Some(List(9)),4)), Map(9 -> (Some(4),Some(List(15)),5)), Map(15
                                                   //|  -> (Some(9),Some(List(1, 13)),10)), Map(0 -> (None,Some(List(3)),0)))
-  val forest2 = Seq( nodeT0, nodeT1, nodeT2, nodeT3, nodeT4 , nodeT0)
+  val forest2 = Seq( nodeT0, nodeT1, nodeT2, nodeT3, nodeT4, nodeT0 )
                                                   //> forest2  : Seq[(Option[Int], Int, Option[List[Int]], Int)] = List((None,0,
                                                   //| Some(List(3)),0), (Some(0),3,Some(List(4)),1), (Some(3),4,Some(List(9)),4)
                                                   //| , (Some(4),9,Some(List(15)),5), (Some(9),15,Some(List(1, 13)),10), (None,0
                                                   //| ,Some(List(3)),0))
-  
-  forest0.head                                    //> res19: Map[Int,(Option[Int], Option[List[Int]], Int)] = Map(0 -> (None,Som
+
+  forest0.head                                    //> res18: Map[Int,(Option[Int], Option[List[Int]], Int)] = Map(0 -> (None,Som
                                                   //| e(List(3)),0))
-  forest0.head.hashCode()                         //> res20: Int = -1555808269
-  identity(forest0.head)                          //> res21: Map[Int,(Option[Int], Option[List[Int]], Int)] = Map(0 -> (None,Som
+  forest0.head.hashCode()                         //> res19: Int = -1555808269
+  identity( forest0.head )                        //> res20: Map[Int,(Option[Int], Option[List[Int]], Int)] = Map(0 -> (None,Som
                                                   //| e(List(3)),0))
-  forest0.last                                    //> res22: Map[Int,(Option[Int], Option[List[Int]], Int)] = Map(0 -> (None,Som
+  forest0.last                                    //> res21: Map[Int,(Option[Int], Option[List[Int]], Int)] = Map(0 -> (None,Som
                                                   //| e(List(3)),0))
-  forest0.last.hashCode()                         //> res23: Int = -1555808269
-  identity(forest0.last)                          //> res24: Map[Int,(Option[Int], Option[List[Int]], Int)] = Map(0 -> (None,Som
+  forest0.last.hashCode()                         //> res22: Int = -1555808269
+  identity( forest0.last )                        //> res23: Map[Int,(Option[Int], Option[List[Int]], Int)] = Map(0 -> (None,Som
                                                   //| e(List(3)),0))
   /*from: scalatest.org
   Checking object identity
@@ -389,29 +415,165 @@ adjasted to (height / 2) node on this path
   the exact same object,
   you can write:
   ref1 should be theSameInstanceAs ref2*/
-  forest0.head == forest0.last                    //> res25: Boolean = true
-  forest0.head eq forest0.last                    //> res26: Boolean = true
-  forest0.head.canEqual(forest0.last)             //> res27: Boolean = true
-  forest0.head.canEqual(forest0.drop(1).head)     //> res28: Boolean = true
-  forest2.head                                    //> res29: (Option[Int], Int, Option[List[Int]], Int) = (None,0,Some(List(3)),
+  forest0.head == forest0.last                    //> res24: Boolean = true
+  forest0.head eq forest0.last                    //> res25: Boolean = true
+  forest0.head.canEqual( forest0.last )           //> res26: Boolean = true
+  forest0.head.canEqual( forest0.drop( 1 ).head ) //> res27: Boolean = true
+  forest2.head                                    //> res28: (Option[Int], Int, Option[List[Int]], Int) = (None,0,Some(List(3)),
                                                   //| 0)
   //forest2.head.isInstanceOf
-  forest2.last                                    //> res30: (Option[Int], Int, Option[List[Int]], Int) = (None,0,Some(List(3)),
+  forest2.last                                    //> res29: (Option[Int], Int, Option[List[Int]], Int) = (None,0,Some(List(3)),
                                                   //| 0)
   //forest2.last.mkString
-  forest2.drop(1).head                            //> res31: (Option[Int], Int, Option[List[Int]], Int) = (Some(0),3,Some(List(4
+  forest2.drop( 1 ).head                          //> res30: (Option[Int], Int, Option[List[Int]], Int) = (Some(0),3,Some(List(4
                                                   //| )),1)
   //forest2.last.isInstanceOf
-  forest2.head equals forest2.last                //> res32: Boolean = true
-  forest2.head eq forest2.last                    //> res33: Boolean = true
-  forest2.head == forest2.last                    //> res34: Boolean = true
-  forest2.head.canEqual(forest2.last)             //> res35: Boolean = true
-  forest2.head.canEqual(forest2.drop(1).head)     //> res36: Boolean = true
+  forest2.head equals forest2.last                //> res31: Boolean = true
+  forest2.head eq forest2.last                    //> res32: Boolean = true
+  forest2.head == forest2.last                    //> res33: Boolean = true
+  forest2.head.canEqual( forest2.last )           //> res34: Boolean = true
+  forest2.head.canEqual( forest2.drop( 1 ).head ) //> res35: Boolean = true
   treeF2( Option( 15 ), 1, Option( List( 14, 6 ) ) ) +: forest2
-                                                  //> res37: Seq[(Option[Int], Int, Option[List[Int]], Int)] = List((Some(15),1,
+                                                  //> res36: Seq[(Option[Int], Int, Option[List[Int]], Int)] = List((Some(15),1,
                                                   //| Some(List(14, 6)),16), (None,0,Some(List(3)),0), (Some(0),3,Some(List(4)),
                                                   //| 1), (Some(3),4,Some(List(9)),4), (Some(4),9,Some(List(15)),5), (Some(9),15
                                                   //| ,Some(List(1, 13)),10), (None,0,Some(List(3)),0))
-  treeF2FindNode( forest2, 15 )                   //> res38: Option[(Option[Int], Int, Option[List[Int]], Int)] = Some((Some(9),
+  treeF2FindNode( forest2, 15 )                   //> res37: Option[(Option[Int], Int, Option[List[Int]], Int)] = Some((Some(9),
                                                   //| 15,Some(List(1, 13)),10))
+  /*? how about reccursion ?
+  & How that can be possibly used ?*/
+  case class SubTree( /*var*/ parent: Option[ SubTree ] = None,
+                      value: Int,/*must be known in any case*/
+                      /*all the elements of a list have the same type*/
+                      /*var*/ /*val*/ children: List[ SubTree ] = Nil, /*List.empty or .isDefined*/
+                      /*var*/ height: Int = -7/*evaluated value
+                      so, must be method
+                      as value expected to be updated
+                      when three structure changes or
+                      nodes be sorted / properly ordered*/ ) {
+    /*calls the "primary constructor" of the class*/
+    /*must be method body*/
+    /** invoke auxiliary constructor
+      * with 'new' keyword
+      */
+    def this( value: Int ) {
+      /*must be something with 'this(param)'*/
+      /*default*/
+      this( None, value, Nil, 0 /*must be parent + 1 or 0*/ )
+    }
+    def this( value: Int,
+              height: Int ) = this( None,
+      value,
+      Nil,
+      height )
+    /*for new elements in tree when
+      known only node value & one child*/
+    def this( value: Int,
+              child: SubTree  ) = this( None,
+      value,
+      List(child),
+      0 )
+    def this( value: Int,
+              children: List[ SubTree ] ) = this( None,
+      value,
+      children,
+      0 )
+    //add 'that' to 'itself' (class member - object / instance of class)
+    def addChild( child: SubTree ) =
+      /*SubTree( parent, value, child +: children, height )*//*woks*/
+      SubTree( parent, value, child.changeHeight +: children, height )
+      
+    def changeHeight(  ) =
+      /*SubTree( parent, value, child +: children, height )*//*woks*/
+      SubTree( parent, value, children, height + 1 )
+  }
+
+  /*for childern manipulation?*/
+  case class ForestOfTrees( val trees: List[ SubTree ] )
+
+  /*________________([1])->6->8->7->2->5
+  0->3->4->9->[15]->([1])->14->10
+              [15]->13*/
+  val fakeRoot = SubTree(
+    Option.empty, /*None*/
+    -1,
+    List.empty, /*'Nil' ?use immutable?*/
+    -1 )                                          //> fakeRoot  : advertisingSpread.kAryTreeTest.SubTree = SubTree(None,-1,List(
+                                                  //| ),-1)
+  val fakeRootCopy = fakeRoot.copy( height = -23 )//> fakeRootCopy  : advertisingSpread.kAryTreeTest.SubTree = SubTree(None,-1,L
+                                                  //| ist(),-23)
+  /*reassigment to 'val'
+  fakeRoot.height = 0
+  fakeRoot.children = fakeRoot.children :: SubTree( None, 0, Nil, 0 )*/
+  /*add new in empty or reassign value, old value lost*/
+  /*fakeRoot.children = List(SubTree(None, 0,Nil ,0))*/ /*works*/
+  /*'+:' not a member of List
+  fakeRoot.children +:= SubTree( None, 0, Nil, 0 )*/
+  /** uses 'this' constructor if exist not 'default' values */
+  fakeRoot.copy( children =  new SubTree( 0 ) +: fakeRoot.children  )
+                                                  //> res38: advertisingSpread.kAryTreeTest.SubTree = SubTree(None,-1,List(SubTr
+                                                  //| ee(None,0,List(),0)),-1)
+  fakeRoot                                        //> res39: advertisingSpread.kAryTreeTest.SubTree = SubTree(None,-1,List(),-1)
+                                                  //| 
+  /*'assignment' operators to reassign a sequence*/
+  /*add new to existing 'List', old value preserved*/
+  /*not enough arguments
+  fakeRoot.children +:= SubTree( None, 3, SubTree( 4 ), 0 )*/
+  /*overloaded method constructor with alternatives*/
+  fakeRoot.addChild( new SubTree( 3, new SubTree( 4 ) ) )
+                                                  //> res40: advertisingSpread.kAryTreeTest.SubTree = SubTree(None,-1,List(SubTr
+                                                  //| ee(None,3,List(SubTree(None,4,List(),0)),1)),-1)
+  val nodeLeaf = new SubTree( 4 )                 //> nodeLeaf  : advertisingSpread.kAryTreeTest.SubTree = SubTree(None,4,List()
+                                                  //| ,0)
+  /*overloaded method constructor with alternatives
+  new SubTree( 3, new SubTree( 4 ))
+  new SubTree( 3, nodeLeaf)*/
+  //fakeRoot.addChild( SubTree( 3, new SubTree( 4 ) ) )
+  fakeRoot                                        //> res41: advertisingSpread.kAryTreeTest.SubTree = SubTree(None,-1,List(),-1)
+                                                  //| 
+  /*fakeRoot.children.scanLeft(z)(op)*/
+  fakeRoot.children.tails.next()                  //> res42: List[advertisingSpread.kAryTreeTest.SubTree] = List()
+  fakeRoot.children.tails.next()                  //> res43: List[advertisingSpread.kAryTreeTest.SubTree] = List()
+  fakeRoot.children.headOption                    //> res44: Option[advertisingSpread.kAryTreeTest.SubTree] = None
+  /*Option(fakeRoot.children/*.isEmpty*/.andThen { x => x.tail })*/
+  fakeRoot.children.andThen { x => x }            //> res45: PartialFunction[Int,advertisingSpread.kAryTreeTest.SubTree] = <func
+                                                  //| tion1>
+  /*java.util.NoSuchElementException*/
+  fakeRoot.children match {
+    case Nil => Nil
+    case nodes => nodes.tail
+  }                                               //> res46: List[advertisingSpread.kAryTreeTest.SubTree] = List()
+  fakeRoot.children match {
+    case Nil => Nil
+    case nodes => nodes.last
+  }                                               //> res47: Product with Serializable = List()
+  fakeRoot.children.drop( 1 )                     //> res48: List[advertisingSpread.kAryTreeTest.SubTree] = List()
+  /*'.head' if '.isDefined' !'.isEmpty'*/
+  fakeRoot.children.drop( 1 ).headOption          //> res49: Option[advertisingSpread.kAryTreeTest.SubTree] = None
+  fakeRoot.children.find { x => x.value == -1 }   //> res50: Option[advertisingSpread.kAryTreeTest.SubTree] = None
+  fakeRoot.children.find { x => x.value == 0 }    //> res51: Option[advertisingSpread.kAryTreeTest.SubTree] = None
+  fakeRoot.children.find { x => x.value == 3 }    //> res52: Option[advertisingSpread.kAryTreeTest.SubTree] = None
+  /*fakeRoot.children.copyToArray(xs, start, len) */
+  /*to remove element from children list*/
+  /*val (before, after) = fakeRoot.children.partition((x:SubTree) => x.value == 3)
+    fakeRoot.children = before ++ after.tail*/ /*works*/
+  fakeRoot                                        //> res53: advertisingSpread.kAryTreeTest.SubTree = SubTree(None,-1,List(),-1)
+                                                  //| 
+
+  /*subTree( Option( subTree() ), 3, Option( List(
+        subTree( Option( subTree ), 4, Option.empty, 2 )
+      ) ), 1 )
+    ) ), 0 )*/ /*,
+    TreeNode( Option( 4 ), 9, Option( List( 15 ) ), 3 ),
+    TreeNode( Option( 9 ), 15, Option( List( 1, 13 ) ), 4 ),
+    TreeNode( Option( 15 ), 13, Option.empty, 5 ),
+    TreeNode( Option( 15 ), 1, Option( List( 6, 14 ) ), 5 ),
+    TreeNode( Option( 1 ), 14, Option( List( 10 ) ), 6 ),
+    TreeNode( Option( 14 ), 10, Option.empty, 7 ),
+    TreeNode( Option( 1 ), 6, Option( List( 8 ) ), 6 ),
+    TreeNode( Option( 6 ), 8, Option( List( 7 ) ), 7 ),
+    TreeNode( Option( 8 ), 7, Option( List( 2 ) ), 8 ),
+    TreeNode( Option( 7 ), 2, Option( List( 5 ) ), 9 ),
+    TreeNode( Option( 2 ), 5, Option.empty, 10 )*/
+  /*)*/
 }

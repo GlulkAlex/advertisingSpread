@@ -16,13 +16,12 @@ object pathFoldTest {
     }
   } //*works                                      //> addRelation: (link: (Int, Int), chain: Seq[Int])Seq[Int]
 
-  /**
-  * @author GlukAlex
-  * @version 1.0, 06/03/2015
-  * @param graph - source tree
-  * @param startIndex - from which node or leaf in tree build a path
-  * @return sequence on connected tree nodes as path
-  */
+  /** @author GlukAlex
+    * @version 1.0, 06/03/2015
+    * @param graph - source tree
+    * @param startIndex - from which node or leaf in tree build a path
+    * @return sequence on connected tree nodes as path
+    */
   def path( graph: Seq[ ( Int, Int ) ],
             startIndex: Int ): Seq[ Int ] = graph
     .foldRight( Seq( startIndex ) )( addRelation ) /*works*/
@@ -45,17 +44,18 @@ object pathFoldTest {
     ( 2, 5 ), ( 7, 2 ), ( 8, 7 ), ( 6, 8 ), ( 1, 6 ), ( 15, 1 ),
     ( 9, 15 ), ( 4, 9 ), ( 3, 4 ), ( 0, 3 ) )     //> test10Vec  : scala.collection.immutable.Vector[(Int, Int)] = Vector((2,5), 
                                                   //| (7,2), (8,7), (6,8), (1,6), (15,1), (9,15), (4,9), (3,4), (0,3))
-  test10Vec.foldRight[ Seq[ Int ] ]( Seq() )( ( link: ( Int, Int ),
-    chain: Seq[ Int ] ) => link._1 +: chain )     //> res0: Seq[Int] = List(2, 7, 8, 6, 1, 15, 9, 4, 3, 0)
-  val test10VecPath = test10Vec.foldRight[ Seq[ Int ] ]( Seq() )( _._1 +: _ )
-                                                  //> test10VecPath  : Seq[Int] = List(2, 7, 8, 6, 1, 15, 9, 4, 3, 0)
-  
+  test10Vec
+    .foldRight[ Seq[ Int ] ]( Seq() )( ( link: ( Int, Int ),
+      chain: Seq[ Int ] ) => link._1 +: chain )   //> res0: Seq[Int] = List(2, 7, 8, 6, 1, 15, 9, 4, 3, 0)
+  val test10VecPath = test10Vec
+    .foldRight[ Seq[ Int ] ]( Seq() )( _._1 +: _ )//> test10VecPath  : Seq[Int] = List(2, 7, 8, 6, 1, 15, 9, 4, 3, 0)
+
   showPath( test10VecPath )                       //> res1: String = 2->7->8->6->1->15->9->4->3->0
-  showPath( test10VecPath.reverse  )              //> res2: String = 0->3->4->9->15->1->6->8->7->2
+  showPath( test10VecPath.reverse )               //> res2: String = 0->3->4->9->15->1->6->8->7->2
   /*without leaf itself
   exactly the right path*/
   test10VecPath.size                              //> res3: Int = 10
-  
+
   test10Vec( 2 )                                  //> res4: (Int, Int) = (8,7)
   path(
     test10Vec,
@@ -73,11 +73,13 @@ object pathFoldTest {
   showPath( path( graph1, 8 ) )                   //> res14: String = 1->2->3->7->8
   showPath( path( graph1, 8 ).reverse )           //> res15: String = 8->7->3->2->1
   /*max possible path length*/
-  Seq( 5, 6, 8 ).foreach( x => println( showPath( path( graph1, x ) ) ) )
+  Seq( 5, 6, 8 )
+    .foreach( x => println( showPath( path( graph1, x ) ) ) )
                                                   //> 1->2->3->4->5
                                                   //| 1->2->3->4->6
                                                   //| 1->2->3->7->8
-  graph1.foreach( x => println( showPath( path( graph1, x._2 ) ) ) )
+  graph1
+    .foreach( x => println( showPath( path( graph1, x._2 ) ) ) )
                                                   //> 1->2
                                                   //| 1->2->3
                                                   //| 1->2->3->4
@@ -90,9 +92,10 @@ object pathFoldTest {
   /*for 'leafs'*/
   val maxPath: Seq[ Int ] = (
     for ( x <- Seq( 5, 6, 8 ) ) yield path( graph1, x ) )
-    .sortWith( _.size > _.size ).head             //> maxPath  : Seq[Int] = List(1, 2, 3, 4, 5)
+    .sortWith( _.size > _.size )
+    .head                                         //> maxPath  : Seq[Int] = List(1, 2, 3, 4, 5)
   val maxPathSize: Int = maxPath.size             //> maxPathSize  : Int = 5
-  
+
   ( 7 + 1 ) / 2                                   //> res17: Int = 4
   ( 7 ) / 2 + 1                                   //> res18: Int = 4
   ( 5 + 1 ) / 2                                   //> res19: Int = 3
@@ -105,7 +108,8 @@ object pathFoldTest {
   //val middleNode = maxPath(maxPath)
   /*index used as amount of elements*/
   val ( toMiddleNode, fromMiddleNode ): ( Seq[ Int ], Seq[ Int ] ) =
-    maxPath.splitAt( middleNodeIndex )            //> toMiddleNode  : Seq[Int] = List(1, 2, 3)
+    maxPath
+      .splitAt( middleNodeIndex )                 //> toMiddleNode  : Seq[Int] = List(1, 2, 3)
                                                   //| fromMiddleNode  : Seq[Int] = List(4, 5)
 
   val minPath: Int = if ( toMiddleNode.size > fromMiddleNode.size )
@@ -114,8 +118,8 @@ object pathFoldTest {
 
   //showPath( path( maxPath, 3 ) )
 
-  ( for ( x <- Seq( 5, 6, 8 ) ) yield path( graph1, x ) ).sortWith( _.size > _.size )
-                                                  //> res21: Seq[Seq[Int]] = List(List(1, 2, 3, 4, 5), List(1, 2, 3, 4, 6), List(
+  ( for ( x <- Seq( 5, 6, 8 ) ) yield path( graph1, x ) )
+    .sortWith( _.size > _.size )                  //> res21: Seq[Seq[Int]] = List(List(1, 2, 3, 4, 5), List(1, 2, 3, 4, 6), List(
                                                   //| 1, 2, 3, 7, 8))
   for ( x <- graph1 ) yield showPath( path( graph1, x._2 ) )
                                                   //> res22: Array[String] = Array(1->2, 1->2->3, 1->2->3->4, 1->2->3->7, 1->2->3
