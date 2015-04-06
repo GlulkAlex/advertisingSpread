@@ -101,11 +101,27 @@ object testTraversables {
   val result6 = list6.collect {
     case x: Int if ( x % 2 == 0 ) => x * 3
   }                                               //> result6  : List[Int] = List(12, 18, 24, 42)
+  
+  list5.collect {
+    case x: Int if ( x % 2 == 0 ) => x
+    /*no need to include all possible cases*/
+    case _                        => None
+  }                                               //> res7: List[Any] = List(None, 2, None, 4, None)
+  list5.collect {
+    case x: Int if ( x % 2 == 0 ) => x
+    //case _                        => None
+  }                                               //> res8: List[Int] = List(2, 4)
+  list5.map {
+    case x: Int if ( x % 2 == 0 ) => x
+    /*if no others match options present then
+    'scala.MatchError:'*/
+    case _                        => None
+  }                                               //> res9: List[Any] = List(None, 2, None, 4, None)
   list6.map {
     case x: Int if ( x % 2 == 0 ) => x * 3
     case _                        => None
-  }                                               //> res7: List[Any] = List(12, 18, None, 24, None, None, 42)
-  result6 /*should be(List(, , , ))*/             //> res8: List[Int] = List(12, 18, 24, 42)
+  }                                               //> res10: List[Any] = List(12, 18, None, 24, None, None, 42)
+  result6 /*should be(List(, , , ))*/             //> res11: List[Int] = List(12, 18, 24, 42)
 
   /*'collect' will 'apply'
   a 'partial function' to
@@ -125,7 +141,7 @@ object testTraversables {
   }                                               //> partialFunction2  : PartialFunction[Int,Int] = <function1>
   val result7 = list7.collect( partialFunction1 orElse partialFunction2 )
                                                   //> result7  : List[Int] = List(12, 18, 28, 24, 36, 52, 42)
-  result7 /*should be(List(, , , , , , ))*/       //> res9: List[Int] = List(12, 18, 28, 24, 36, 52, 42)
+  result7 /*should be(List(, , , , , , ))*/       //> res12: List[Int] = List(12, 18, 28, 24, 36, 52, 42)
 
   /*'foreach' will 'apply'
   a function to
@@ -142,7 +158,7 @@ object testTraversables {
                                                   //| 36
                                                   //| 52
                                                   //| 56
-  list8 /*should be(List(, , , , , , ))*/         //> res10: List[Int] = List(4, 6, 7, 8, 9, 13, 14)
+  list8 /*should be(List(, , , , , , ))*/         //> res13: List[Int] = List(4, 6, 7, 8, 9, 13, 14)
 
   /*'toArray' will
   'convert' any 'Traversable' to
@@ -153,14 +169,14 @@ object testTraversables {
   val result8 = set2.toArray                      //> result8  : Array[Int] = Array(14, 6, 9, 13, 7, 8, 4)
   /*type check*/
   result8.isInstanceOf[ Array[ Int ] ] /*should be()*/
-                                                  //> res11: Boolean = true
+                                                  //> res14: Boolean = true
   /*'toList' will
   'convert' any 'Traversable' to a 'List'.*/
   val set3 = Set( 4, 6, 7, 8, 9, 13, 14 )         //> set3  : scala.collection.immutable.Set[Int] = Set(14, 6, 9, 13, 7, 8, 4)
   val result9 = set3.toList                       //> result9  : List[Int] = List(14, 6, 9, 13, 7, 8, 4)
   /*? plaseholder '_' for 'Any' ?*/
   result9.isInstanceOf[ List[ _ ] ] /*should be()*/
-                                                  //> res12: Boolean = true
+                                                  //> res15: Boolean = true
   /*'toList', as well as
   other 'conversion' methods like
   'toSet',
@@ -169,7 +185,7 @@ object testTraversables {
   the 'collection' 'type' is the same.*/
   val list10 = List( 5, 6, 7, 8, 9 )              //> list10  : List[Int] = List(5, 6, 7, 8, 9)
   val result10 = list10.toList                    //> result10  : List[Int] = List(5, 6, 7, 8, 9)
-  result10 eq list10 /*should be()*/              //> res13: Boolean = true
+  result10 eq list10 /*should be()*/              //> res16: Boolean = true
 
   /*'toIterable' will
   'convert' any 'Traversable' to
@@ -182,9 +198,10 @@ object testTraversables {
   val set11 = Set( 4, 6, 7, 8, 9, 13, 14 )        //> set11  : scala.collection.immutable.Set[Int] = Set(14, 6, 9, 13, 7, 8, 4)
   val result11 = set11.toIterable                 //> result11  : Iterable[Int] = Set(14, 6, 9, 13, 7, 8, 4)
   result11.isInstanceOf[ Iterable[ _ ] ] /*should be()*/
-                                                  //> res14: Boolean = true
-  result11.iterator.hasNext                       //> res15: Boolean = true
-  result11.iterator.next                          //> res16: Int = 14
+                                                  //> res17: Boolean = true
+  result11.iterator.hasNext                       //> res18: Boolean = true
+  result11.iterator.next                          //> res19: Int = 14
+  result11.headOption                             //> res20: Option[Int] = Some(14)
 
   /*'toSeq' will
   'convert' any 'Traversable' to
@@ -201,10 +218,10 @@ object testTraversables {
   val set12 = Set( 4, 6, 7, 8, 9, 13, 14 )        //> set12  : scala.collection.immutable.Set[Int] = Set(14, 6, 9, 13, 7, 8, 4)
   val result12 = set12.toSeq                      //> result12  : Seq[Int] = ArrayBuffer(14, 6, 9, 13, 7, 8, 4)
   result12.isInstanceOf[ Seq[ _ ] ] /*should be()*/
-                                                  //> res17: Boolean = true
-  set12( 0 )                                      //> res18: Boolean = false
-  set12( 14 )                                     //> res19: Boolean = true
-  result12( 0 )                                   //> res20: Int = 14
+                                                  //> res21: Boolean = true
+  set12( 0 )                                      //> res22: Boolean = false
+  set12( 14 )                                     //> res23: Boolean = true
+  result12( 0 )                                   //> res24: Int = 14
 
   /*'toIndexedSeq' will
   'convert' any 'Traversable' to
@@ -215,7 +232,7 @@ object testTraversables {
   val result13 = set13.toIndexedSeq               //> result13  : scala.collection.immutable.IndexedSeq[Int] = Vector(14, 6, 9, 1
                                                   //| 3, 7, 8, 4)
   result13.isInstanceOf[ IndexedSeq[ _ ] ] /*should be()*/
-                                                  //> res21: Boolean = true
+                                                  //> res25: Boolean = true
   /*'toStream' will
   convert any 'Traversable' to
   a 'Stream' which is
@@ -225,14 +242,14 @@ object testTraversables {
   val list14 = List( 4, 6, 7, 8, 9, 13, 14 )      //> list14  : List[Int] = List(4, 6, 7, 8, 9, 13, 14)
   val result14 = list14.toStream                  //> result14  : scala.collection.immutable.Stream[Int] = Stream(4, ?)
   result14.isInstanceOf[ Stream[ _ ] ] /*should be()*/
-                                                  //> res22: Boolean = true
-  ( result14 take 3 ) /*should be(List(, , ))*/   //> res23: scala.collection.immutable.Stream[Int] = Stream(4, ?)
-  ( result14 take 3 ).tail                        //> res24: scala.collection.immutable.Stream[Int] = Stream(6, ?)
-  ( result14 take 3 ).head                        //> res25: Int = 4
-  ( result14 take 1 ) /*should be(List(, , ))*/   //> res26: scala.collection.immutable.Stream[Int] = Stream(4, ?)
-  ( result14 take 1 ).tail                        //> res27: scala.collection.immutable.Stream[Int] = Stream()
-  ( result14 take 1 ).head                        //> res28: Int = 4
-  ( result14 take 0 ) /*should be(List(, , ))*/   //> res29: scala.collection.immutable.Stream[Int] = Stream()
+                                                  //> res26: Boolean = true
+  ( result14 take 3 ) /*should be(List(, , ))*/   //> res27: scala.collection.immutable.Stream[Int] = Stream(4, ?)
+  ( result14 take 3 ).tail                        //> res28: scala.collection.immutable.Stream[Int] = Stream(6, ?)
+  ( result14 take 3 ).head                        //> res29: Int = 4
+  ( result14 take 1 ) /*should be(List(, , ))*/   //> res30: scala.collection.immutable.Stream[Int] = Stream(4, ?)
+  ( result14 take 1 ).tail                        //> res31: scala.collection.immutable.Stream[Int] = Stream()
+  ( result14 take 1 ).head                        //> res32: Int = 4
+  ( result14 take 0 ) /*should be(List(, , ))*/   //> res33: scala.collection.immutable.Stream[Int] = Stream()
 
   /*'toSet' will
   'convert' any 'Traversable' to
@@ -244,5 +261,83 @@ object testTraversables {
   val result15 = list15.toSet                     //> result15  : scala.collection.immutable.Set[Int] = Set(14, 6, 9, 13, 7, 8, 4
                                                   //| )
   result15.isInstanceOf[ Set[ _ ] ] /*should be()*/
-                                                  //> res30: Boolean = true
+                                                  //> res34: Boolean = true
+  /*'toMap'
+  will convert
+  any 'Traversable' to a 'Map'.
+  How it's used depends on
+  the original collection;
+  if it's a 'List' or 'Seq',
+  it should be of parameterized type 'Tuple2'.*/
+  val list16 = List( "Phoenix" -> "Arizona", "Austin" -> "Texas" )
+                                                  //> list16  : List[(String, String)] = List((Phoenix,Arizona), (Austin,Texas))
+                                                  //| 
+  val result16 = list16.toMap                     //> result16  : scala.collection.immutable.Map[String,String] = Map(Phoenix -> 
+                                                  //| Arizona, Austin -> Texas)
+  result16.isInstanceOf[ Map[ _, _ ] ] /*should be()*/
+                                                  //> res35: Boolean = true
+  /*'isEmpty' is pretty self evident*/
+	val map17 = Map("Phoenix" -> "Arizona", "Austin" -> "Texas")
+                                                  //> map17  : scala.collection.immutable.Map[String,String] = Map(Phoenix -> Ari
+                                                  //| zona, Austin -> Texas)
+	map17.isEmpty /*should be()*/             //> res36: Boolean = false
+	
+	val set17 = Set()                         //> set17  : scala.collection.immutable.Set[Nothing] = Set()
+	set17.isEmpty /*should be()*/             //> res37: Boolean = true
+	
+  /*'nonEmpty' is pretty self evident too*/
+	val map18 = Map("Phoenix" -> "Arizona", "Austin" -> "Texas")
+                                                  //> map18  : scala.collection.immutable.Map[String,String] = Map(Phoenix -> Ari
+                                                  //| zona, Austin -> Texas)
+	map18.nonEmpty /*should be()*/            //> res38: Boolean = true
+	
+	val set18 = Set()                         //> set18  : scala.collection.immutable.Set[Nothing] = Set()
+	set18.nonEmpty /*should be()*/            //> res39: Boolean = false
+	
+	/*'size' provides the 'size' of the 'traversable'*/
+  val map19 = Map("Phoenix" -> "Arizona", "Austin" -> "Texas")
+                                                  //> map19  : scala.collection.immutable.Map[String,String] = Map(Phoenix -> Ari
+                                                  //| zona, Austin -> Texas)
+  map19.size /*should be()*/                      //> res40: Int = 2
+  
+  /*'hasDefiniteSize'
+  will return
+  'true' if
+  there is 'traversable' that
+  has a 'finite' end,
+  otherwise 'false'.*/
+  val map20 = Map("Phoenix" -> "Arizona", "Austin" -> "Texas")
+                                                  //> map20  : scala.collection.immutable.Map[String,String] = Map(Phoenix -> Ari
+                                                  //| zona, Austin -> Texas)
+  map20.hasDefiniteSize /*should be()*/           //> res41: Boolean = true
+
+	import Stream.cons
+	val stream20 = cons(0, cons(1, Stream.empty))
+                                                  //> stream20  : Stream.Cons[Int] = Stream(0, ?)
+	stream20.hasDefiniteSize /*should be()*/  //> res42: Boolean = false
+	
+	/*'head'
+	will return
+	the first element of
+	an ordered collection, or
+	some random element if
+	order is
+	not defined like in a 'Set' or 'Map'*/
+  val list21 = List(10, 19, 45, 1, 22)            //> list21  : List[Int] = List(10, 19, 45, 1, 22)
+  list21.head /*should be()*/                     //> res43: Int = 10
+  
+  /*'headOption'
+  will return
+  the first element as an 'Option' of
+  an order collection, or
+  some random element if
+  order is not defined.
+  If a first element is
+  not available, then
+  'None' is returned.*/
+	val list22 = List(10, 19, 45, 1, 22)      //> list22  : List[Int] = List(10, 19, 45, 1, 22)
+	list22.headOption /*should be(Some())*/   //> res44: Option[Int] = Some(10)
+	
+	val list23 = List()                       //> list23  : List[Nothing] = List()
+	list23.headOption /*should be()*/         //> res45: Option[Nothing] = None
 }

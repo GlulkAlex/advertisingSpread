@@ -83,6 +83,21 @@ object treeFromLinkedListsTest {
 	1.2 if not go up to previous level then (1)
 	2.if one node deeper / below another
 	2.1 go up from deeper node with bigger height to same level then (1.1)*/
+
+  /*? May be use
+	Map(Leaf -> Root) where
+	'Leaf' is 'Child'
+	'Root is List(NodeValue, isListHead, Next, Prev, ChildHeight, isLeaf)' ?
+	? and change 'List' content if necessery ?
+	? replacing it with new 'List' ?*/
+  case class Edge( var isListHead: Boolean = false,
+                   var Next: Option[ Int ] = None,
+                   var Prev: Option[ Int ] = None,
+                   var NodeValue: Option[ Int ], /*start node*/
+                   var Child: Option[ Int ], /*end node*/
+                   var ChildHeight: Int = 1,
+                   var isLeaf: Boolean = true )
+
   case class Edges( isListHead: Boolean,
                     Next: Option[ Int ],
                     Prev: Option[ Int ],
@@ -124,6 +139,50 @@ object treeFromLinkedListsTest {
     ( 3, 4 ),
     ( 1, 6 ) )                                    //> edgesUnsorted  : Seq[(Int, Int)] = List((6,8), (15,1), (1,14), (0,3), (15,1
                                                   //| 3), (9,15), (2,5), (14,10), (4,9), (7,2), (8,7), (3,4), (1,6))
+  val edgesMap = edgesUnsorted.toMap              //> edgesMap  : scala.collection.immutable.Map[Int,Int] = Map(0 -> 3, 14 -> 10,
+                                                  //|  1 -> 6, 6 -> 8, 9 -> 15, 2 -> 5, 7 -> 2, 3 -> 4, 8 -> 7, 4 -> 9, 15 -> 13)
+                                                  //| 
+  val edgesLeafToParentMap = edgesUnsorted.map( ( x: ( Int, Int ) ) => ( x._2, x._1 ) ).toMap
+                                                  //> edgesLeafToParentMap  : scala.collection.immutable.Map[Int,Int] = Map(5 -> 
+                                                  //| 2, 10 -> 14, 14 -> 1, 1 -> 15, 6 -> 1, 9 -> 4, 13 -> 15, 2 -> 7, 7 -> 8, 3 
+                                                  //| -> 0, 8 -> 6, 4 -> 3, 15 -> 9)
+  val edgesLeafToParentMap2 = edgesUnsorted.map( ( x: ( Int, Int ) ) => x._2 -> x._1 ).toMap
+                                                  //> edgesLeafToParentMap2  : scala.collection.immutable.Map[Int,Int] = Map(5 ->
+                                                  //|  2, 10 -> 14, 14 -> 1, 1 -> 15, 6 -> 1, 9 -> 4, 13 -> 15, 2 -> 7, 7 -> 8, 3
+                                                  //|  -> 0, 8 -> 6, 4 -> 3, 15 -> 9)
+  /*duplicated root values in keys*/
+  edgesMap.size                                   //> res0: Int = 11
+  edgesLeafToParentMap.size                       //> res1: Int = 13
+  edgesUnsorted.size                              //> res2: Int = 13
+  /*tree traversal
+  from leaf to root*/
+  edgesLeafToParentMap2.getOrElse( 13, -1 )       //> res3: Int = 15
+  edgesLeafToParentMap2.getOrElse( 15, -1 )       //> res4: Int = 9
+  edgesLeafToParentMap2.getOrElse( 9, -1 )        //> res5: Int = 4
+  edgesLeafToParentMap2.getOrElse( 4, -1 )        //> res6: Int = 3
+  edgesLeafToParentMap2.getOrElse( 3, -1 )        //> res7: Int = 0
+  /*root*/
+  edgesLeafToParentMap2.getOrElse( 0, -1 )        //> res8: Int = -1
+
+  edgesLeafToParentMap2.keys.groupBy { x => 13 }  //> res9: scala.collection.immutable.Map[Int,Iterable[Int]] = Map(13 -> Set(5, 
+                                                  //| 10, 14, 1, 6, 9, 13, 2, 7, 3, 8, 4, 15))
+  edgesLeafToParentMap2.keys.takeWhile { x => x == 13 }
+                                                  //> res10: Iterable[Int] = Set()
+  edgesLeafToParentMap2.keys.groupBy { x => 15 }  //> res11: scala.collection.immutable.Map[Int,Iterable[Int]] = Map(15 -> Set(5,
+                                                  //|  10, 14, 1, 6, 9, 13, 2, 7, 3, 8, 4, 15))
+  edgesLeafToParentMap2.keys.dropWhile { x => x == 15 }
+                                                  //> res12: Iterable[Int] = Set(5, 10, 14, 1, 6, 9, 13, 2, 7, 3, 8, 4, 15)
+  edgesLeafToParentMap2.keys.groupBy { x => 0 }   //> res13: scala.collection.immutable.Map[Int,Iterable[Int]] = Map(0 -> Set(5, 
+                                                  //| 10, 14, 1, 6, 9, 13, 2, 7, 3, 8, 4, 15))
+  edgesLeafToParentMap2.keys.iterator.withFilter { x => 0 == x }
+                                                  //> res14: Iterator[Int] = empty iterator
+  edgesLeafToParentMap2.keys.iterator.indexOf( 9 )//> res15: Int = 5
+  edgesLeafToParentMap2.keys.iterator.drop( 5 ).next()
+                                                  //> res16: Int = 9
+  edgesLeafToParentMap2.iterator.drop( 5 - 1 )    //> res17: Iterator[(Int, Int)] = non-empty iterator
+  edgesLeafToParentMap2.iterator.drop( 5 - 1 ).next()
+                                                  //> res18: (Int, Int) = (6,1)
+  edgesLeafToParentMap2.iterator.drop( 5 ).next() //> res19: (Int, Int) = (9,4)
   val edgesFrom_test3: String = "21\n" +
     "0 1\n" +
     "0 8\n" +
@@ -172,10 +231,14 @@ object treeFromLinkedListsTest {
                                                   //|  5 6, 5 7, 8 9, 8 12, 9 10, 9 11, 12 13, 12 14, 15 16, 15 19, 16 17, 16 18,
                                                   //|  19 20, 19 21)
 
-  edgesFrom_test3.size                            //> res0: Int = 106
+  edgesFrom_test3.size                            //> res20: Int = 106
   val edgesNumber = inputLines( 0 ).split( " " )( 0 ).toInt
                                                   //> edgesNumber  : Int = 21
   val inputLine = inputLines( 1 ).split( " " )    //> inputLine  : Array[String] = Array(0, 1)
+  /*'Array' is mutable,
+  so
+  no need to create new collection with
+  chenged elements*/
   val inputArray1: Seq[ ( Int, Int ) ] = for ( line <- inputLines.tail ) yield {
     ( line.split( " " )( 0 ).toInt, line.split( " " )( 1 ).toInt )
                                                   //> inputArray1  : Seq[(Int, Int)] = ArraySeq((0,1), (0,8), (0,15), (1,2), (1,5
@@ -183,21 +246,41 @@ object treeFromLinkedListsTest {
                                                   //| 14), (15,16), (15,19), (16,17), (16,18), (19,20), (19,21))
   }
 
-  edgesNumber == inputArray1.size                 //> res1: Boolean = true
-  inputArray1( 20 )                               //> res2: (Int, Int) = (19,21)
+  edgesNumber == inputArray1.size                 //> res21: Boolean = true
+  inputArray1( 20 )                               //> res22: (Int, Int) = (19,21)
 
   def fillTreeArray( edges: Seq[ ( Int, Int ) ] /*,
                      treeList: Seq[ Edges ] = Seq.empty*/ ): Seq[ Edges ] = {
+      def findParent( nodeValue: Option[ Int ],
+                      treeList: Seq[ Edges ] = Seq.empty ): Option[ Edges ] =
+        /*one possible element of Edges return or None*/
+        treeList.find( ( elem: Edges ) => elem.Child == nodeValue )
+      def findChild( nodeChild: Option[ Int ],
+                     treeList: Seq[ Edges ] = Seq.empty ): Option[ Edges ] =
+        /*one possible element of Edges return or None*/
+        treeList.find( ( elem: Edges ) => elem.NodeValue == nodeChild )
+      def updateNodeHeight: Int = ???
       def loop( edgesRemains: Seq[ ( Int, Int ) ],
                 treeList: Seq[ Edges ] = Seq.empty ): Seq[ Edges ] = {
         if ( edgesRemains.isEmpty ) {
           treeList
         } else {
-          val isListHead: Boolean = true
-          val nextNode: Option[ Int ] = None
-          val prevNode: Option[ Int ] = Option.empty
           val nodeValue: Option[ Int ] = Option( edgesRemains.head._1 )
           val nodeChild: Option[ Int ] = Option( edgesRemains.head._2 )
+          val parent: Option[ Edges ] = findParent( nodeValue,
+            treeList )
+          /*must be reference to the element in 'treeList'
+          if 'Array' then simply 'index'
+          if 'List' then ?*/
+          val prevNode: Option[ Int ] = /*Option.empty*/
+            if ( parent == None ) {
+              None
+            } else {
+              /*? & update parent.nextNode ?*/
+              parent.get.NodeValue
+            }
+          val isListHead: Boolean = true
+          val nextNode: Option[ Int ] = None
           val childNodeHeight: Int = 1
           val isLeaf: Boolean = true
           val newEdge: Edges = new Edges(
@@ -208,7 +291,10 @@ object treeFromLinkedListsTest {
             nodeChild,
             childNodeHeight,
             isLeaf )
-
+          /*? only change whole 'newEdge'?
+          too slow & many operations */
+          //val (seq1, seq2) = seq.partition(p)
+          //seq1 ++ Seq(newEdge) ++ seq2
           loop( edgesRemains = edgesRemains.tail,
             newEdge +: treeList )
         }
@@ -217,14 +303,46 @@ object treeFromLinkedListsTest {
     loop( edgesRemains = edges )
   }                                               //> fillTreeArray: (edges: Seq[(Int, Int)])Seq[advertisingSpread.treeFromLinked
                                                   //| ListsTest.Edges]
-  fillTreeArray( inputArray1 ).head               //> res3: advertisingSpread.treeFromLinkedListsTest.Edges = Edges(true,None,Non
-                                                  //| e,Some(19),Some(21),1,true)
-  fillTreeArray( inputArray1 ).last               //> res4: advertisingSpread.treeFromLinkedListsTest.Edges = Edges(true,None,Non
-                                                  //| e,Some(0),Some(1),1,true)
-  fillTreeArray( edgesUnsorted ).head             //> res5: advertisingSpread.treeFromLinkedListsTest.Edges = Edges(true,None,Non
-                                                  //| e,Some(1),Some(6),1,true)
-  fillTreeArray( edgesUnsorted ).last             //> res6: advertisingSpread.treeFromLinkedListsTest.Edges = Edges(true,None,Non
-                                                  //| e,Some(6),Some(8),1,true)
+  lazy val tree1 = fillTreeArray( inputArray1 )   //> tree1: => Seq[advertisingSpread.treeFromLinkedListsTest.Edges]
+  tree1.head                                      //> res23: advertisingSpread.treeFromLinkedListsTest.Edges = Edges(true,None,So
+                                                  //| me(15),Some(19),Some(21),1,true)
+  tree1.last                                      //> res24: advertisingSpread.treeFromLinkedListsTest.Edges = Edges(true,None,No
+                                                  //| ne,Some(0),Some(1),1,true)
+  lazy val tree2 = fillTreeArray( edgesUnsorted ) //> tree2: => Seq[advertisingSpread.treeFromLinkedListsTest.Edges]
+  tree2.head                                      //> res25: advertisingSpread.treeFromLinkedListsTest.Edges = Edges(true,None,So
+                                                  //| me(15),Some(1),Some(6),1,true)
+  tree2.last                                      //> res26: advertisingSpread.treeFromLinkedListsTest.Edges = Edges(true,None,No
+                                                  //| ne,Some(6),Some(8),1,true)
+  tree2.size                                      //> res27: Int = 13
+  tree2( 0 )                                      //> res28: advertisingSpread.treeFromLinkedListsTest.Edges = Edges(true,None,So
+                                                  //| me(15),Some(1),Some(6),1,true)
+  tree2( 12 )                                     //> res29: advertisingSpread.treeFromLinkedListsTest.Edges = Edges(true,None,No
+                                                  //| ne,Some(6),Some(8),1,true)
+  /*reassigment,
+  so
+  unmutable*/
+  //tree2(12).height = 2
+  var t2Array = tree2.toArray                     //> t2Array  : Array[advertisingSpread.treeFromLinkedListsTest.Edges] = Array(E
+                                                  //| dges(true,None,Some(15),Some(1),Some(6),1,true), Edges(true,None,Some(0),So
+                                                  //| me(3),Some(4),1,true), Edges(true,None,Some(6),Some(8),Some(7),1,true), Edg
+                                                  //| es(true,None,None,Some(7),Some(2),1,true), Edges(true,None,None,Some(4),Som
+                                                  //| e(9),1,true), Edges(true,None,Some(1),Some(14),Some(10),1,true), Edges(true
+                                                  //| ,None,None,Some(2),Some(5),1,true), Edges(true,None,None,Some(9),Some(15),1
+                                                  //| ,true), E
+                                                  //| Output exceeds cutoff limit.
+  /*'Edges' still 'val',
+  so
+  unmutable*/
+  //t2Array(12).height = 2
+
+  tree2.find( ( elem: Edges ) => elem.Child == Some( 8 ) )
+                                                  //> res30: Option[advertisingSpread.treeFromLinkedListsTest.Edges] = Some(Edges
+                                                  //| (true,None,None,Some(6),Some(8),1,true))
+  tree2.find( ( elem: Edges ) => elem.Child == Some( 5 ) )
+                                                  //> res31: Option[advertisingSpread.treeFromLinkedListsTest.Edges] = Some(Edges
+                                                  //| (true,None,None,Some(2),Some(5),1,true))
+  tree2.find( ( elem: Edges ) => elem.Child == Some( 0 ) )
+                                                  //> res32: Option[advertisingSpread.treeFromLinkedListsTest.Edges] = None
 
   val Edges0: Edges = new Edges( true,
     None /*Int.в*/ ,
@@ -236,4 +354,15 @@ object treeFromLinkedListsTest {
                                                   //| ,None,None,None,1,true)
   val Edges1: Edges = new Edges()                 //> Edges1  : advertisingSpread.treeFromLinkedListsTest.Edges = Edges(true,None
                                                   //| ,None,None,None,1,true)
+  val mapValue: List[ _ /*Int, Option[Int], Boolean*/ ] = List( true, None, None, Some( 2 ), Some( 5 ), 1, true )
+                                                  //> mapValue  : List[_] = List(true, None, None, Some(2), Some(5), 1, true)
+  val mapValue2: List[ Edge ] = List( Edge( true, None, None, Some( 2 ), Some( 5 ), 1, true ) )
+                                                  //> mapValue2  : List[advertisingSpread.treeFromLinkedListsTest.Edge] = List(E
+                                                  //| dge(true,None,None,Some(2),Some(5),1,true))
+  mapValue.head                                   //> res33: _$1 = true
+  mapValue(3)                                     //> res34: _$1 = Some(2)
+  mapValue2.head.NodeValue                        //> res35: Option[Int] = Some(2)
+  mapValue2.head.isLeaf = false
+  mapValue2                                       //> res36: List[advertisingSpread.treeFromLinkedListsTest.Edge] = List(Edge(tr
+                                                  //| ue,None,None,Some(2),Some(5),1,false))
 }
