@@ -6,6 +6,24 @@ import math._
 //import scala.io.StdIn.readLine
 import scala.io.Source
 
+/* may be even,
+ * use 'clustering' problem approach
+ * where
+ * 'spacing' is our goal
+ * as optimal maximum minimal 'path' / 'distance' to
+ * any 'nodes' in 'tree' &
+ * 'k' - clusters number == 
+ * 'leafs' + 'root' + 'optimal node'(may be same as root)
+ * remember that
+ * goal is to find 'distance' / 'spacing'
+ * not an exact 'node' from where possible to
+ * reach all others 'nodes' at most 
+ * at 's' steps <= 'spacing'
+ * Problem is
+ * that 'distance' between adjusted nodes == '1'
+ * so 
+ * that must be the 'spacing' value
+ * */
 /*some implementation of 
  * data structure,
  * Prim's algorithm (lazy & Eager approach, priority queue),
@@ -16,6 +34,34 @@ import scala.io.Source
 /**? the 'minimax path' problem ?*/
 /*or*/
 /**? 'minimum spanning tree' ?*/
+/* shortest possible path from 
+ * some 'special' nodes to any other in 'tree' or
+ * amount of 'steps' to reach all nodes in 'graph'
+ * at least no less then from 'root'
+ * to farthest / furthest / max distant 'leaf'
+ * or '(max)tree height'
+ * Assumption:
+ * if 
+ * 'distance' to any other 'leaf' from 'root'
+ * equal to arbitrary chosen 'max distant 'leaf'' then
+ * 'path' from 'root' is optimal
+ * else if
+ * exists 'leafs' with 'path' to 'root' / 'tree height (for that leaf)'
+ * less then for 'max distant 'leaf'' then
+ * check
+ * path to 'leaf' with 'second max distant path to root' against
+ * 'node' laying / within / belongs to 
+ * path from 'max distant 'leaf'' to 'root'
+ * starting from node in the middle of that path
+ * closer to 'root'
+ * If max path from this 'node' to
+ * 'root',
+ * 'max distant 'leaf'', &
+ * 'second max distant leaf' 
+ * less then
+ * default == '(max)tree height' then
+ * that path is optimal
+ * */
 /*description:
 codingame.com Sponsored Challenge from Teads
 Goal:
