@@ -62,6 +62,24 @@ import scala.io.Source
  * default == '(max)tree height' then
  * that path is optimal
  * */
+
+ /* In general, assume that:
+  * minimal possible maximum distance from
+  * some 'special' 'node' within tree
+  * to any other 'node'
+  * equal to 
+  * max of 'Rank' or 'Height' value for
+  * 'node' with
+  * 'Rank' = treeHeight / 2 or maxLeafHeight / 2
+  * or  
+  * 'Height' = rootRank / 2 or maxNodeRank / 2
+  * where
+  * 'Rank' = maxChildNodeRank + 1 
+  * (as distance to 'max distant' subtree 'leaf'
+  * from this 'node'
+  * where 'node' is 'root' of subtree)
+  */
+
 /*description:
 codingame.com Sponsored Challenge from Teads
 Goal:

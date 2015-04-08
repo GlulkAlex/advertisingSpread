@@ -134,19 +134,20 @@ object kAryTreeTest {
     exactly 'one parent', and
     the 'root' must have 'no parents'.
   */
-/*Arborescence (graph theory)
-From Wikipedia, the free encyclopedia
-
-Tree (graph theory).
-In graph theory,
-an 'arborescence' is
-a 'directed graph' in which,
-for a 'vertex' 'u' called the 'root' and any other vertex 'v',
-there is
-exactly one 'directed path' from 'u' to 'v'.
-An 'arborescence' is thus
-the 'directed-graph' form of a 'rooted tree',
-understood here as an undirected graph.*/
+  /*
+  Arborescence (graph theory)
+	From Wikipedia, the free encyclopedia
+	
+	Tree (graph theory).
+	In graph theory,
+	an 'arborescence' is
+	a 'directed graph' in which,
+	for a 'vertex' 'u' called the 'root' and any other vertex 'v',
+	there is
+	exactly one 'directed path' from 'u' to 'v'.
+	An 'arborescence' is thus
+	the 'directed-graph' form of a 'rooted tree',
+	understood here as an undirected graph.*/
 
   /*restrictions:
 	no duplicate(ed) values
@@ -170,16 +171,25 @@ understood here as an undirected graph.*/
                                                   //| >0}[nonEmpty, .. , nonEmpty, .. , Empty]
   /**Where:*/
   /*(Nil) or (!='value') -- 'parent' node or root value
-{Nil;-1} or {1;0} or {2;>0} -- {'value';'height'}
-[Empty] or [nonEmpty, .. , nonEmpty, .. , Empty] --
-list of children subtrees
-*/
+	{Nil;-1} or {1;0} or {2;>0} -- {'value';'height'}
+	[Empty] or [nonEmpty, .. , nonEmpty, .. , Empty] --
+	list of children subtrees
+	*/
+	/**Alternative*/
+	/*
+	'root' may point to itself as it's parent
+	not 'None' / 'null' but same value
+	that eliminates use of 'Option' type
+	*/
+	
   /*convention:
-How to choose in which child store / add value / search for specific value ?
-check with head.value, then next child in list ?
-No, tree already predefined
-only build copy / representation needed
-*/
+	How to choose
+	in which child store / add value / search for specific value ?
+	check with 'head.value', then
+	next child in list ?
+	No, tree already predefined
+	only build copy / representation needed
+	*/
 
   /*Example:
                   ([1])->6->8->7->2->5
@@ -334,8 +344,8 @@ adjasted to (height / 2) node on this path
   may be changed with futher import obtained
   when nessesery*/
   val node0 = treeF( Option.empty, 0, Option( List( 3 ) ) )
-                                                  //> node0  : Map[Int,(Option[Int], Option[List[Int]], Int)] = Map(0 -> (None,So
-                                                  //| me(List(3)),0))
+                                                  //> node0  : Map[Int,(Option[Int], Option[List[Int]], Int)] = Map(0 -> (None,S
+                                                  //| ome(List(3)),0))
   val nodeT0 = treeF2( Option.empty, 0, Option( List( 3 ) ) )
                                                   //> nodeT0  : (Option[Int], Int, Option[List[Int]], Int) = (None,0,Some(List(3
                                                   //| )),0)
