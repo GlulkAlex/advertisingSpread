@@ -63,7 +63,7 @@ import scala.io.Source
  * that path is optimal
  * */
 
- /* In general, assume that:
+/* In general, assume that:
   * minimal possible maximum distance from
   * some 'special' 'node' within tree
   * to any other 'node'
@@ -79,7 +79,7 @@ import scala.io.Source
   * from this 'node'
   * where 'node' is 'root' of subtree)
   */
-  /* Possibly,
+/* Possibly,
    * 'minimal possible maximum distance'
    * may be obtained / gained / achieved / returned
    * at the end of input / data structure initialization
@@ -163,9 +163,10 @@ from nodes to all leafs & root
 /* possible use of '.toSet' to
  * eliminate duplicates or 'distinct' Operation on sequences    
  * */
-/**Assumption:
- * input graph connected
- * all vertices / nodes reachable from each other*/
+/** Assumption:
+  * input graph connected
+  * all vertices / nodes reachable from each other
+  */
 object Solution {
 
   /*fork is
@@ -177,14 +178,14 @@ object Solution {
    * def msort[T](xs: List[T])(implicit ord: Ordering) = { ...}
    * pairArray.sorted - works, but not much helpful) 
    * if non found then root or 1st element in array*/
-  /**When an 'edge' connects two 'vertices', 
-   * we say that 
-   * the 'vertices' are 'adjacent' to one another and 
-   * that the 'edge' is 'incident on' both 'vertices'.
-   * 
-   * The 'degree' of a vertex is 
-   * the number of 'edges' 'incident on' it.
-   * */
+  /** When an 'edge' connects two 'vertices',
+    * we say that
+    * the 'vertices' are 'adjacent' to one another and
+    * that the 'edge' is 'incident on' both 'vertices'.
+    *
+    * The 'degree' of a vertex is
+    * the number of 'edges' 'incident on' it.
+    */
   def firstFork(
     graph: Vector[ ( Int, Int ) ] ): Int = {
     //graph.foreach { x => print(x + ',') }
@@ -203,43 +204,43 @@ object Solution {
       if ( graph.size > 0 ) { graph.head._1 } else { -1 }
     }
   }
-  /**A 'path' in a graph is 
-   * a 'sequence of vertices' connected by 'edges'. 
-   * A 'simple path' is 
-   * one with no repeated 'vertices'.
-   * 
-   * The 'length' of a 'path' or 
-   * a 'cycle' is 
-   * its number of 'edges'.
-   * 
-   * We say that 
-   * one vertex is 'connected' to another if 
-   * there exists a 'path' that contains both of them.
-   * 
-   * A graph is 'connected' if 
-   * there is a 'path' from every 'vertex' to every other 'vertex'.
-   * 
-   * A 'graph' that is not connected consists of 
-   * a set of 'connected components', which are 
-   * maximal 'connected subgraphs'.
-   * 
-   * An 'acyclic graph' is 
-   * a 'graph' with no 'cycles'.
-   * 
-   * A 'tree' is an 'acyclic connected graph'.
-   * 
-   * A 'forest' is 
-   * a 'disjoint set' of 'trees'.
-   * 
-   * A 'spanning tree' of 
-   * a 'connected graph' is 
-   * a 'subgraph' that 
-   * contains all of that graph's 'vertices' and 
-   * is a 'single tree'. 
-   * A 'spanning forest' of a 'graph' is 
-   * the 'union' of 
-   * the 'spanning trees' of its 'connected components'.
-   * */
+  /** A 'path' in a graph is
+    * a 'sequence of vertices' connected by 'edges'.
+    * A 'simple path' is
+    * one with no repeated 'vertices'.
+    *
+    * The 'length' of a 'path' or
+    * a 'cycle' is
+    * its number of 'edges'.
+    *
+    * We say that
+    * one vertex is 'connected' to another if
+    * there exists a 'path' that contains both of them.
+    *
+    * A graph is 'connected' if
+    * there is a 'path' from every 'vertex' to every other 'vertex'.
+    *
+    * A 'graph' that is not connected consists of
+    * a set of 'connected components', which are
+    * maximal 'connected subgraphs'.
+    *
+    * An 'acyclic graph' is
+    * a 'graph' with no 'cycles'.
+    *
+    * A 'tree' is an 'acyclic connected graph'.
+    *
+    * A 'forest' is
+    * a 'disjoint set' of 'trees'.
+    *
+    * A 'spanning tree' of
+    * a 'connected graph' is
+    * a 'subgraph' that
+    * contains all of that graph's 'vertices' and
+    * is a 'single tree'.
+    * A 'spanning forest' of a 'graph' is
+    * the 'union' of
+    * the 'spanning trees' of its 'connected components'.
+    */
   def pathToRoot(
     graph: Vector[ ( Int, Int ) ],
     fromLeaf: Int,
@@ -402,52 +403,325 @@ object Solution {
     result
   }
 
-  //unit test
-  def main( args: Array[ String ] ) {
-    val graph2 = Array(
-      "1 2", //root
-      "2 3",
-      "3 4",
-      "3 7",
-      "4 5", //end
-      "4 6", //end
-      "7 8" //end
-    ) //min path == 2
-    val lineVecTest = Vector(
-      ( 1, 2 ), ( 2, 3 ), ( 3, 4 ),
-      ( 4, 5 ), ( 5, 6 ), ( 6, 7 ), ( 7, 8 ) ) //min path == 4 = 7 / 2 + 1
-    val test1 = Vector( ( 0, 1 ),
-      ( 1, 2 ),
-      ( 2, 3 ),
-      ( 2, 4 ) )
-    val test2 = Vector( ( 0, 1 ),
-      ( 1, 2 ),
-      ( 1, 4 ),
-      ( 2, 3 ),
-      ( 4, 5 ),
-      ( 4, 6 ) ) //min path == 2
+  case class Node(
+    var Value: Int = -1, /*for undefined*/
+    var CurrentHeight: Int = 1, /*'0' for 'root'*/
+    var CurrentRank: Int = 0 /*'0' for 'leaf'*/ ) {
+    override def toString() = "{val:" + this.Value +
+      ",h:" + this.CurrentHeight +
+      ",R:" + this.CurrentRank + "}"
+  }
 
+  case class Edge( Start: Int = -1,
+                   End: Int = -1 ) {
+    override def toString() = "{from:" + this.Start +
+      ">to:" + this.End + "}"
+  }
+
+  /*for 'Map.getOrElse' 'default'*/
+  val emptyNode = Node( -1, 0, 0 )
+  val emptyEdge = Edge( -1, -1 )
+
+  /*first node with more then one child or
+  parent of two or more nodes with
+  same height &
+  that hegith mast be as minimal as possible
+  if single chain line with no branches at all then
+  element with '0' height aka 'root'*/
+  def firstFork( rankedTree: Map[ Int, Node ],
+                 edgesMap: Map[ Int, Edge ] ): Node = {
+
+    /*expensive*/
+    /*if do inverse ?
+     * node with max unique height & not leaf ?
+     * or 
+     * firstly sort by decreasing 'rank' then
+     * check until has children >= '2'
+     * */
+    lazy val fork = ( for {
+      nodes <- rankedTree.values
+      if ( rankedTree.count {
+        x => x._2.CurrentHeight == nodes.CurrentHeight
+      } ) > 1
+    } yield nodes )
+    //*debug
+    //*println("fork:" + fork.take(3))
+
+    if ( fork.size > 0 ) {
+      /*pick child with minimum '.CurrentHeight' &
+      find it parent or
+      if 'height' = 1 then
+      find node with
+      'height' = 0*/
+      lazy val child =
+        /*'Test_6_input.txt'
+         * key not found: 1036*/
+        edgesMap
+          .getOrElse( 
+            /*how non empty list may fails ?*/  
+            fork
+              .min( Ordering[ Int ]
+                .on( ( x: Node ) => x.CurrentHeight ) 
+                ).Value , 
+            emptyEdge)
+      if ( child == emptyEdge ) {
+        //*debug
+        println("Warning! 'fork' fails !\n" + 
+            "fork.size is:" + fork.size + "\n" +
+            "fork.take(3) is:" + fork.take(3))
+        emptyNode
+      } else {
+    	  rankedTree( child.Start )
+      }     
+    } else {
+      if ( rankedTree.size > 0 ) {
+        rankedTree
+          .values
+          .max( Ordering[ Int ]
+            .on( ( x: Node ) => x.CurrentRank ) )
+      } else {
+    	  //*debug
+    	  //println("Warning! 'rankedTree' fails !")
+        emptyNode
+      }
+    }
+  } /*works*/
+
+  /*'rankedTree' & 'edgesMap' is not empty*/
+  def rankFork( rankedTree: Map[ Int, Node ],
+                 edgesMap: Map[ Int, Edge ] ): Node = {
+    /*'Map' is unsorted*/
+    val rankSortedTree = rankedTree
+      .values
+      .view
+      .toSeq
+      .sorted ( Ordering[ Int ]
+            .reverse
+            .on( ( x: Node ) => x.CurrentRank ) )
+    /*!seq.exists(p)*/
+    def innerLoop(nodesLeft: Seq[Node],
+     fork: Node = emptyNode): Node =
+       if (nodesLeft.isEmpty) {
+         /*that is distinguishable as wrong*/
+         emptyNode
+       } else {
+         /*'nodesLeft.head' as 'start' in 'edgesMap'*/
+         /*'seq.count(p)'
+         faster then '.filter'*/
+         if (edgesMap
+           .count(x => x._2.Start == nodesLeft.head.Value) > 1) {
+             nodesLeft.head
+         } else {
+           innerLoop(nodesLeft.tail,
+             nodesLeft.head)
+         }
+       }
+    
+    /*return value
+    initializaton*/
+    innerLoop(rankSortedTree, rankSortedTree.head)
+  }/*works                                        //> rankFork: (rankedTree: Map[Int,advertisingSpread.treeMapsTest.Node], edges
+  but may be too slow*/  
+  
+  /** compares:
+    * rootNode &
+    * firstFork (may be same as 'root') &
+    * optimalNode (if exist, must be if .size > 1)
+    */
+  def optimalDistance( root: Node,
+                       firstFork: Node,
+                       optimalNode: Node ): Int = {
+    //var optimalPath: Int = 0
+    /*first condition must be tested
+     * for optimality*/
+    /*if ( optimalNode.CurrentRank - optimalNode.CurrentHeight <= 1 ) {
+      /*Math.max(optimalNode.CurrentRank, optimalNode.CurrentHeight)*/
+      optimalNode.CurrentRank max optimalNode.CurrentHeight
+      //* val optimalPath = 
+       *    Math
+       *      .max(optimalNode.CurrentRank, optimalNode.CurrentHeight)
+   *      optimalPath
+       */
+    } else {*/
+    if ( firstFork == root ) {
+      root.CurrentRank
+    } else {
+      val forkPath = firstFork.CurrentRank max firstFork.CurrentHeight
+
+      if ( optimalNode.CurrentRank - optimalNode.CurrentHeight <= 1 ) {
+        /*Math.max(optimalNode.CurrentRank, optimalNode.CurrentHeight)*/
+        val optimalPath = optimalNode.CurrentRank max optimalNode.CurrentHeight
+        //optimalPath = Math.max(optimalNode.CurrentRank, optimalNode.CurrentHeight)
+        optimalPath
+      } else {
+        forkPath //*.toInt
+      }
+    }
+    //*}
+  } /*works*/
+
+  /*until reaches all 'leafs' in subTree
+  nodes with '.CurrentRank = 0'*/
+  /**propagate 'Height' down to subtree*/
+  def subTreeHeightUpdate( parent: Int,
+                           parentHeight: Int,
+                           edgesMap: Map[ Int, Edge ],
+                           nodesMap: Map[ Int, Node ] ): Unit = {
+    val childrenList = edgesMap
+      //.view
+      .values
+      .filter { x => x.Start == parent }
+
+      def innerLoop( childrenLeft: Iterable /*List*/ [ Edge ],
+                     baseHeight: Int ): Iterable /*List*/ [ Edge ] = {
+        if ( childrenLeft.isEmpty ) {
+          /*done & return*/
+          childrenLeft
+        } else {
+          /*for each element in list*/
+          /*must be in 'nodesMap' already*/
+          val child = nodesMap( childrenLeft.head.End )
+
+          if ( child.CurrentHeight < parentHeight + 1 ) {
+            child.CurrentHeight = parentHeight + 1
+
+            if ( child.CurrentRank == 0 ) {
+              /*done & next*/
+            } else {
+              /*has it's own children*/
+              child.CurrentHeight = parentHeight + 1
+
+              /*propagate 'Height' down to subtree*/
+              subTreeHeightUpdate( child.Value,
+                child.CurrentHeight,
+                edgesMap,
+                nodesMap )
+            }
+
+            //innerLoop( childrenLeft.tail, parentHeight )
+          } else {
+          }
+          /*next in list*/
+          /*forward reference extends over
+            definition of value 'childrenList'
+            solution:
+            val childrenList must be declared first*/
+          innerLoop( childrenLeft.tail, parentHeight )
+        }
+      }
+
+    if ( childrenList.isEmpty ) {
+      /*done & return*/
+    } else {
+      /*for each element in list*/
+      /*initialization*/
+      innerLoop( childrenList, parentHeight )
+    }
+    //if (nodesMap( start ).CurrentHeight)
+  } /*work                                        //> subTreeHeightUpdate: (parent: Int, parentHeight: Int)Unit
+  & possibly like expected*/
+
+  /*until 'root' or
+  parent.CurrentRank > child.CurrentRank + 1*/
+  /*if (nodesMap('start').rank < 'end'.rank + 1) then
+             nodesMap('start').rank = 'end'.rank + 1 }*/
+  /** rankIncrement
+    * by '+1' from child
+    */
+  def parentRankUpdate( parent: Int, /*start*/
+                        childRank: Int, /* = 0*/ /*end.rank*/
+                        edgesMap: Map[ Int, Edge ],
+                        nodesMap: Map[ Int, Node ] ): Unit = {
+
+    /*if ( childRank == -1 ) {
+      /*done & return*/
+    } else {*/
+    /*try to find parent in 'nodesMap'*/
+    val nodeParent: Node = nodesMap
+      .getOrElse( parent, emptyNode )
+
+    if ( nodeParent == emptyNode ) {
+      /*done & return*/
+    } else {
+      if ( nodeParent.CurrentRank > childRank + 1 ) {
+        /*done & return*/
+      } else {
+        nodeParent.CurrentRank = childRank + 1
+        /*try to update futher up to 'root'*/
+        val nextParent: Edge =
+          edgesMap
+            .getOrElse( parent /*as 'end'*/ , emptyEdge )
+        if ( nextParent == emptyEdge ) {
+          /*done & return*/
+        } else {
+          /*recursion*/
+          parentRankUpdate( nextParent.Start,
+            nodeParent.CurrentRank,
+            edgesMap,
+            nodesMap )
+        }
+      }
+    }
+    //*}
+  } /*works                                       //> parentRankUpdate: (parent: Int, childRank: Int)Unit
+  as expected
+  when added where needed*/
+
+  val graph2 = Array(
+    "1 2", //root
+    "2 3",
+    "3 4",
+    "3 7",
+    "4 5", //end
+    "4 6", //end
+    "7 8" //end
+  ) //min path == 2
+  val lineVecTest = Vector(
+    ( 1, 2 ), ( 2, 3 ), ( 3, 4 ),
+    ( 4, 5 ), ( 5, 6 ), ( 6, 7 ), ( 7, 8 ) ) //min path == 4 = 7 / 2 + 1
+  val test1 = Vector( ( 0, 1 ),
+    ( 1, 2 ),
+    ( 2, 3 ),
+    ( 2, 4 ) )
+  val test2 = Vector( ( 0, 1 ),
+    ( 1, 2 ),
+    ( 1, 4 ),
+    ( 2, 3 ),
+    ( 4, 5 ),
+    ( 4, 6 ) ) //min path == 2
+
+  def inputTest( testFileNumber: Int ): Int /*Iterator[ String ]*/ = {
     //default path needed
     //if not implicit
-    val testNumber = 10
-    val filename = "Test_" + testNumber + "_input.txt"
+    /*val testNumber = 10*/
+    val filename = "Test_" +
+      /*testNumber*/ testFileNumber +
+      "_input.txt"
     val filePath = "E:\\Java\\coursera-workspace\\Challenge\\"
     val currFile = Source
       .fromFile( filePath + filename )
-    val currFileLines = Source
+    lazy val currFileLines = Source
       .fromFile( filePath + filename )
       .getLines()
+
+    /*currFileLines
+  }*/
+
+    //*lazy val currFileLines = inputTest( 1 )
     /*as 1st line is '.head'*/
     /*to skip 1st line in file*/
     val n = if ( currFileLines.hasNext ) {
       currFileLines.next().toInt
     } else { 0 } //*works
-    val fileContent: Iterator[ String ] = Iterator()
+    /*val fileContent: Iterator[ String ] = Iterator()*/
     //val testGraph: Vector[ ( Int, Int ) ] = Vector()
     /*size known upfront*/
-    val pairArray: Array[ ( Int, Int ) ] =
+    lazy val pairArray: Array[ ( Int, Int ) ] =
       new Array[ ( Int, Int ) ]( n )
-    val leafsArray = new Array[ Int ]( n )
+    /*val leafsArray = new Array[ Int ]( n )*/
+
+    var edgesMap: Map[ Int, Edge ] = Map()
+    var nodesMap: Map[ Int, Node ] = Map()
 
     /** My effective code must be
       * within that loop / for expression
@@ -471,6 +745,71 @@ object Solution {
           case _                => ( -1, -1 )
         } //*works 
 
+      val start = /*inputData*/ pairArray( i )._1
+      val end = /*inputData*/ pairArray( i )._2
+
+      /*to avoide 'Serialazible'*/
+      /*val nodesMapStart = nodesMap.getOrElse( start, None )*/
+      /*? not a reference ?*/
+      val nodesMapStart = nodesMap.getOrElse( start, emptyNode )
+      /*val nodesMapEnd = nodesMap.getOrElse( end, None )*/
+      val nodesMapEnd = nodesMap.getOrElse( end, emptyNode )
+
+      /*may be mast be after 'nodesMap' updates*/
+      edgesMap += ( end -> Edge(
+        Start = start,
+        End = end ) )
+
+      if ( nodesMapStart == /*None*/ emptyNode &&
+        nodesMapEnd == /*None*/ emptyNode ) {
+        nodesMap += ( start -> Node(
+          Value = start,
+          CurrentHeight = 0,
+          CurrentRank = 1 ) )
+        nodesMap += ( end -> Node(
+          Value = end,
+          CurrentHeight = 1,
+          CurrentRank = 0 ) )
+      } else if ( nodesMapStart != /*None*/ emptyNode &&
+        nodesMapEnd == /*None*/ emptyNode ) {
+        nodesMap += ( end -> Node(
+          Value = end,
+          CurrentHeight = nodesMap( start ).CurrentHeight + 1,
+          CurrentRank = 0 ) )
+        //*debug
+        //println("nodesMap(start).CurrentHeight:" + nodesMap(start).CurrentHeight)
+
+        parentRankUpdate( /*as edge end*/ start,
+          0,
+          edgesMap,
+          nodesMap )
+      } else if ( nodesMapStart == /*None*/ emptyNode &&
+        nodesMapEnd != /*None*/ emptyNode ) {
+        nodesMap += ( start -> Node(
+          Value = start,
+          CurrentHeight = 0,
+          CurrentRank = nodesMap( end ).CurrentRank + 1 ) )
+        /*propagate 'Height' down to subtree*/
+        subTreeHeightUpdate(
+          parent = end,
+          parentHeight = 0,
+          edgesMap = edgesMap,
+          nodesMap = nodesMap )
+      } else if ( nodesMapStart != /*None*/ emptyNode &&
+        nodesMapEnd != /*None*/ emptyNode ) {
+        parentRankUpdate( /*as edge end*/ start,
+          nodesMap( end ).CurrentRank,
+          edgesMap,
+          nodesMap )
+        /*propagate 'Height' down to subtree*/
+        /*nodesMap('start').height + 1*/
+        subTreeHeightUpdate( start, /*to find all children of 'start'*/
+          nodesMap( start ).CurrentHeight,
+          edgesMap,
+          nodesMap )
+      } else {
+      }
+
       /*do not check against all elements in 'pairArray' only i-th count
        * if any ._1 appear more then twice then
        * check fails
@@ -484,16 +823,43 @@ object Solution {
       }*/ //*work 
     }
 
-    //*val testGraph = test2
-    val testGraph: Vector[ ( Int, Int ) ] = pairArray.sorted.toVector
-    //testGraph unzip
-    //*val ( nodesSeq, leafsSeq ) = pairArray.unzip
-    /*for {
+    lazy val mostDistantLeaf = nodesMap
+      .values
+      .max( Ordering[ Int ]
+        .on( ( x: Node ) => x.CurrentHeight ) )
+    lazy val rootNode = nodesMap
+      .values
+      .max( Ordering[ Int ]
+        .on( ( x: Node ) => x.CurrentRank ) )
+    lazy val optimalNode = nodesMap
+      .values
+      .filter { x =>
+        ( x.CurrentHeight == mostDistantLeaf.CurrentHeight / 2 ||
+          x.CurrentRank == rootNode.CurrentRank / 2 ) &&
+          ( x.CurrentHeight + x.CurrentRank == mostDistantLeaf.CurrentHeight ||
+            x.CurrentHeight + x.CurrentRank == rootNode.CurrentRank )
+      }
+      .head
+    //*lazy val fork = firstFork( nodesMap, edgesMap )
+    lazy val fork = rankFork( nodesMap, edgesMap )
+
+    /*return value
+   * for testing*/
+    optimalDistance( root = rootNode,
+      firstFork = fork,
+      optimalNode = optimalNode )
+  }
+  //*val testGraph = test2
+  //*val testGraph: Vector[ ( Int, Int ) ] = pairArray.sorted.toVector
+
+  //testGraph unzip
+  //*val ( nodesSeq, leafsSeq ) = pairArray.unzip
+  /*for {
       node: Int <- nodesSeq.toSet
       } {print(node + ",")}*/ //*work
-    //*println( "nodesSeq is: " + ( nodesSeq mkString "," ) )
-    //*println( "leafsSeq is: " + ( leafsSeq mkString "," ) )
-    /*same as 'treeLeafs' but with zip instead of much
+  //*println( "nodesSeq is: " + ( nodesSeq mkString "," ) )
+  //*println( "leafsSeq is: " + ( leafsSeq mkString "," ) )
+  /*same as 'treeLeafs' but with zip instead of much
     val leafs = ( for {
       // *curNode: Int <- nodesSeq.toSet
       // *curNode <- nodesSeq
@@ -502,55 +868,80 @@ object Solution {
     	if nodesSeq.forall(_ != curLeaf)
     } yield curLeaf ).toVector*/ //*works
 
-    val leafs = treeLeafs( testGraph )
+  //*val leafs = treeLeafs( testGraph )
 
-    //*println( "leafsArray was: " + ( leafsArray mkString "," ) )
-    //*val leafs = ( leafsArray filterNot ( _ == -1 ) ).toVector
-    //*val maxPath = longestPath( testGraph, leafs )
-    val fork = firstFork( testGraph )
-    //*val minPath = pathToFork( testGraph, leafs, fork, maxPath )
+  //*println( "leafsArray was: " + ( leafsArray mkString "," ) )
+  //*val leafs = ( leafsArray filterNot ( _ == -1 ) ).toVector
+  //*val maxPath = longestPath( testGraph, leafs )
 
-    //*val pathFold = path( testGraph, leafs.head )
+  //*val fork = firstFork( testGraph )
 
-    /*for 'leafs'*/
-    val maxPath: Seq[ Int ] = (
-      for ( leaf <- leafs )
-        //*yield path( testGraph, leaf ) 
-        //yield path(pathToRoot( testGraph, leaf ), testGraph.head._1 )
-        //yield path(pathToRoot( testGraph, leaf ), leaf )
-        yield pathToRoot( testGraph, leaf )
-        .foldRight[ Seq[ Int ] ]( Seq() )( _._1 +: _ ) //*work
-    )
-      .sortWith( _.size > _.size ) //*work
-      //.sortWith( _.size < _.size )
-      .head
+  //*val minPath = pathToFork( testGraph, leafs, fork, maxPath )
 
-    val maxPathSize: Int = maxPath.size
+  //*val pathFold = path( testGraph, leafs.head )
+
+  /*for 'leafs'*/
+  //*val maxPath: Seq[ Int ] = (
+  //*for ( leaf <- leafs )
+  //*yield path( testGraph, leaf ) 
+  //yield path(pathToRoot( testGraph, leaf ), testGraph.head._1 )
+  //yield path(pathToRoot( testGraph, leaf ), leaf )
+
+  //*yield pathToRoot( testGraph, leaf )
+  //*.foldRight[ Seq[ Int ] ]( Seq() )( _._1 +: _ ) //*work
+  //*)
+  //*.sortWith( _.size > _.size ) //*work
+  //.sortWith( _.size < _.size )
+  //*.head
+
+  /*val maxPathSize: Int = maxPath.size
     val middleNodeIndex: Int = if ( maxPathSize % 2 == 0 ) {
       maxPathSize / 2
-    } else { ( maxPathSize + 1 ) / 2 }
-    /*how to get list element by index ?
+    } else { ( maxPathSize + 1 ) / 2 }*/
+
+  /*how to get list element by index ?
   or other data type needed ?*/
-    /*index used as amount of elements*/
-    val ( toMiddleNode, fromMiddleNode ): ( Seq[ Int ], Seq[ Int ] ) =
+  /*index used as amount of elements*/
+  /*val ( toMiddleNode, fromMiddleNode ): ( Seq[ Int ], Seq[ Int ] ) =
       maxPath
         .splitAt( middleNodeIndex )
     val minPath: Int = if ( toMiddleNode.size > fromMiddleNode.size ) {
       toMiddleNode.size
-    } else { fromMiddleNode.size }
-    //val n = readInt
-    //*val n = testGraph match {
-    //*case Vector() => 0
-    //*case _        => testGraph.size
-    //case _        => testGraph.head._1
-    //*} // le nombre 'n' de relations au total.
+    } else { fromMiddleNode.size }*/
 
+  //val n = readInt
+  //*val n = testGraph match {
+  //*case Vector() => 0
+  //*case _        => testGraph.size
+  //case _        => testGraph.head._1
+  //*} // le nombre 'n' de relations au total.
+
+  //unit test
+  def main( args: Array[ String ] ) {
     //*println( "fileContent is: " + fileContent )
     //*println( "fileContent size is: " + fileContent.size )
     /*any operation on 'Iterator' affect its content ?*/
     //*println( "fileContent is: " + fileContent.mkString )
     //println( "fileContent first element is: " + fileContent.take(0)/*.mkString*/ )
-    println( "total number of relations? / elements in graph is: " + n )
+    //*println( "total number of relations? / elements in graph is: " + n )
+
+    /*println( "optimalDistance is: " +
+      optimalDistance( root = rootNode,
+        firstFork = fork,
+        optimalNode = optimalNode ) )*/
+    println( "expected # for Test_1_output.txt is: " + 2 )
+    println( "expected # for Test_2_output.txt is: " + 2 )
+    println( "expected # for Test_3_output.txt is: " + 3 )
+    println( "expected # for Test_4_output.txt is: " + 5 )
+    println( "expected # for Test_5_output.txt is: " + 5 )
+    println( "expected # for Test_6_output.txt is: " + 7 )
+    println( "actual is: " + inputTest( 6 ) )
+    println( "expected # for Test_7_output.txt is: " + 15 )
+    println( "actual is: " + inputTest( 7 ) )
+    println( "expected # for Test_8_output.txt is: " + 9 )
+    //*println( "actual is: " + inputTest( 8 ) )
+    println( "expected # for Test_9_output.txt is: " + 15 )
+    println( "expected # for Test_10_output.txt is: " + 5 )
     //*println( "testGraph first 7 elements is: " + testGraph.take( 7 ) )
     /*leafs.foreach {
       x =>
@@ -561,12 +952,12 @@ object Solution {
     //*println( "minPath is: " + minPath.size )
     //*println( "minPath is: " + minPath )
     /*may be too long & big*/
-    println( "pairArray is: " + ( pairArray.take( 7 ) mkString "," ) )
+    //*println( "pairArray is: " + ( pairArray.take( 7 ) mkString "," ) )
     //*println( "leafsArray is: " + ( leafsArray mkString "," ) )
     //*println( "leafs is: " + leafs )
     //*println( "treeLeafs1(testGraph) is: " + treeLeafs1( testGraph ) )
     //*println( "fork is: " + fork )
-    println( "maxPath is: " + ( maxPath mkString "->" ) )
+    //*println( "maxPath is: " + ( maxPath mkString "->" ) )
     /*generic tree view*/
     //*testGraph.foreach( x => println( showPath( path( testGraph, x._2 ) ) ) )
     /*leafs
