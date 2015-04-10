@@ -539,6 +539,18 @@ object pathTest {
     ( 2, 3 ),
     ( 2, 4 ) ) //min==2                           //> test1  : scala.collection.immutable.Vector[(Int, Int)] = Vector((0,1), (1,
                                                   //| 2), (2,3), (2,4))
+  /*
+  0>1>2>3
+  (0>1)>4>5
+  (0>1)>(4)>6
+  
+  0>1>
+     2>3
+     4>
+      5
+      6
+  */
+  3 / 2                                           //> res71: Int(1) = 1
   val test2 = Vector( ( 0, 1 ),
     ( 1, 2 ),
     ( 1, 4 ),
@@ -586,26 +598,26 @@ object pathTest {
   val fork = firstFork( testGraph )               //> fork  : Int = 0
   val leafs = treeLeafs( testGraph )              //> leafs  : Vector[Int] = Vector(3, 4, 6, 7, 10, 11, 13, 14, 17, 18, 20, 21)
                                                   //| 
-  treeLeafs2( testGraph )                         //> res71: Vector[Int] = Vector(3, 4, 6, 7, 10, 11, 13, 14, 17, 18, 20, 21)
-  treeLeafs3( testGraph )                         //> res72: Vector[Int] = Vector(3, 4, 6, 7, 10, 11, 13, 14, 17, 18, 20, 21)
-  treeLeafs4( testGraph )                         //> res73: Vector[Int] = Vector(3, 4, 6, 7, 10, 11, 13, 14, 17, 18, 20, 21)
+  treeLeafs2( testGraph )                         //> res72: Vector[Int] = Vector(3, 4, 6, 7, 10, 11, 13, 14, 17, 18, 20, 21)
+  treeLeafs3( testGraph )                         //> res73: Vector[Int] = Vector(3, 4, 6, 7, 10, 11, 13, 14, 17, 18, 20, 21)
+  treeLeafs4( testGraph )                         //> res74: Vector[Int] = Vector(3, 4, 6, 7, 10, 11, 13, 14, 17, 18, 20, 21)
   val maxPath = longestPath( testGraph, leafs )   //> maxPath  : Vector[(Int, Int)] = Vector((2,3), (1,2), (0,1))
   val minPath = pathToFork( testGraph, leafs, fork, maxPath )
                                                   //> minPath  : Vector[(Int, Int)] = Vector((2,3), (1,2), (0,1))
 
-  Vector() :+ 1                                   //> res74: scala.collection.immutable.Vector[Int] = Vector(1)
-  inputVector2                                    //> res75: Vector[(Int, Int)] = Vector((1,2), (2,3), (3,4), (3,7), (4,5), (4,6
+  Vector() :+ 1                                   //> res75: scala.collection.immutable.Vector[Int] = Vector(1)
+  inputVector2                                    //> res76: Vector[(Int, Int)] = Vector((1,2), (2,3), (3,4), (3,7), (4,5), (4,6
                                                   //| ), (7,8))
-  inputVector2.count { x => x._1 == 1 }           //> res76: Int = 1
-  inputVector2.count { x => x._1 == 3 }           //> res77: Int = 2
-  inputVector2.count { x => x._1 == 8 }           //> res78: Int = 0
-  inputVector2.count { x => x._1 == 5 }           //> res79: Int = 0
-  inputVector2.count { x => x._1 == 6 }           //> res80: Int = 0
-  inputVector2.count { x => x._1 == 7 }           //> res81: Int = 1
-  firstFork( lineVecTest )                        //> res82: Int = 1
-  pathToRoot( inputVector2, 1 )                   //> res83: Vector[(Int, Int)] = Vector()
-  pathToRoot( inputVector2, 3 )                   //> res84: Vector[(Int, Int)] = Vector((2,3), (1,2))
-  pathToRoot( inputVector2, 8 )                   //> res85: Vector[(Int, Int)] = Vector((7,8), (3,7), (2,3), (1,2))
+  inputVector2.count { x => x._1 == 1 }           //> res77: Int = 1
+  inputVector2.count { x => x._1 == 3 }           //> res78: Int = 2
+  inputVector2.count { x => x._1 == 8 }           //> res79: Int = 0
+  inputVector2.count { x => x._1 == 5 }           //> res80: Int = 0
+  inputVector2.count { x => x._1 == 6 }           //> res81: Int = 0
+  inputVector2.count { x => x._1 == 7 }           //> res82: Int = 1
+  firstFork( lineVecTest )                        //> res83: Int = 1
+  pathToRoot( inputVector2, 1 )                   //> res84: Vector[(Int, Int)] = Vector()
+  pathToRoot( inputVector2, 3 )                   //> res85: Vector[(Int, Int)] = Vector((2,3), (1,2))
+  pathToRoot( inputVector2, 8 )                   //> res86: Vector[(Int, Int)] = Vector((7,8), (3,7), (2,3), (1,2))
 
   def intPair( line: String ) /*: ( Int, Int )*/ = {
     var node = ""
@@ -676,37 +688,37 @@ object pathTest {
 
   val fileStr = "1 2"                             //> fileStr  : String = 1 2
 
-  fileStr.charAt( 0 )                             //> res86: Char = 1
-  fileStr.charAt( 2 )                             //> res87: Char = 2
+  fileStr.charAt( 0 )                             //> res87: Char = 1
+  fileStr.charAt( 2 )                             //> res88: Char = 2
   intPair( fileStr )                              //> char=1
                                                   //| char= 
                                                   //| char=2
-                                                  //| res88: (String, String) = (1,2)
+                                                  //| res89: (String, String) = (1,2)
   intPair( "3" )                                  //> char=3
-                                                  //| res89: (String, String) = (3,"")
-  strPair( "4" )                                  //> res90: (String, String) = (4,"")
-  strPair( "5 6" )                                //> res91: (String, String) = (5,6)
-  " ".charAt( 0 ).isSpaceChar                     //> res92: Boolean = true
-  " ".charAt( 0 ).charValue() == " "              //> res93: Boolean = false
-  " ".charAt( 0 ).charValue() == ' '              //> res94: Boolean = true
-  " ".charAt( 0 ) == ' '                          //> res95: Boolean = true
-  " ".charAt( 0 ).isWhitespace                    //> res96: Boolean = true
-  " ".charAt( 0 ).getNumericValue                 //> res97: Int = -1
-  " ".equalsIgnoreCase( " " )                     //> res98: Boolean = true
+                                                  //| res90: (String, String) = (3,"")
+  strPair( "4" )                                  //> res91: (String, String) = (4,"")
+  strPair( "5 6" )                                //> res92: (String, String) = (5,6)
+  " ".charAt( 0 ).isSpaceChar                     //> res93: Boolean = true
+  " ".charAt( 0 ).charValue() == " "              //> res94: Boolean = false
+  " ".charAt( 0 ).charValue() == ' '              //> res95: Boolean = true
+  " ".charAt( 0 ) == ' '                          //> res96: Boolean = true
+  " ".charAt( 0 ).isWhitespace                    //> res97: Boolean = true
+  " ".charAt( 0 ).getNumericValue                 //> res98: Int = -1
+  " ".equalsIgnoreCase( " " )                     //> res99: Boolean = true
   val test10 = Map( 6 -> 8, 15 -> 1, 1 -> 14, 0 -> 3, 15 -> 13,
     9 -> 15, 2 -> 5, 14 -> 10, 4 -> 9, 7 -> 2,
     8 -> 7, 3 -> 4, 1 -> 6 )                      //> test10  : scala.collection.immutable.Map[Int,Int] = Map(0 -> 3, 14 -> 10, 
                                                   //| 1 -> 6, 6 -> 8, 9 -> 15, 2 -> 5, 7 -> 2, 3 -> 4, 8 -> 7, 4 -> 9, 15 -> 13)
                                                   //| 
-  test10.toList.sorted                            //> res99: List[(Int, Int)] = List((0,3), (1,6), (2,5), (3,4), (4,9), (6,8), (
-                                                  //| 7,2), (8,7), (9,15), (14,10), (15,13))
+  test10.toList.sorted                            //> res100: List[(Int, Int)] = List((0,3), (1,6), (2,5), (3,4), (4,9), (6,8), 
+                                                  //| (7,2), (8,7), (9,15), (14,10), (15,13))
   test10.toList sortWith ((n1:(Int,Int),n2:(Int,Int)) => n1._1 == n2._2 )
-                                                  //> res100: List[(Int, Int)] = List((0,3), (14,10), (6,8), (1,6), (9,15), (2,5
+                                                  //> res101: List[(Int, Int)] = List((0,3), (14,10), (6,8), (1,6), (9,15), (2,5
                                                   //| ), (7,2), (4,9), (3,4), (8,7), (15,13))
   test10.toVector sortWith ((n1:(Int,Int),n2:(Int,Int)) => n1._1 > n2._2 )
-                                                  //> res101: scala.collection.immutable.Vector[(Int, Int)] = Vector((14,10), (9
+                                                  //> res102: scala.collection.immutable.Vector[(Int, Int)] = Vector((14,10), (9
                                                   //| ,15), (15,13), (6,8), (8,7), (3,4), (7,2), (0,3), (1,6), (2,5), (4,9))
   test10.toSeq sortWith ((n1:(Int,Int),n2:(Int,Int)) => n1._1 < n2._2 )
-                                                  //> res102: Seq[(Int, Int)] = ArrayBuffer((2,5), (1,6), (0,3), (7,2), (3,4), (
+                                                  //> res103: Seq[(Int, Int)] = ArrayBuffer((2,5), (1,6), (0,3), (7,2), (3,4), (
                                                   //| 4,9), (6,8), (8,7), (9,15), (14,10), (15,13))
 }

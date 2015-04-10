@@ -212,7 +212,13 @@ object treeFromLinkedListsTest {
     var Next: Int, /*same as 'Child' or
                    selfreference*/
     var CurrentHeight: Int = 1, /*'0' for 'root'*/
-    var CurrentRank: Int = 0 /*'0' for 'leaf'*/ )
+    var CurrentRank: Int = 0 /*'0' for 'leaf'*/ ) {
+    override def toString() = "{p:" + this.Prev +
+      ",C:" + this.Current +
+      ",n:" + this.Next +
+      ",h:" + this.CurrentHeight +
+      ",R:" + this.CurrentRank + "}"
+  }
 
   case class Edges( isListHead: Boolean,
                     Next: Option[ Int ],
@@ -343,9 +349,9 @@ object treeFromLinkedListsTest {
                                                   //| 19 20
                                                   //| 19 21
   val inputLines = edgesFrom_test3
-    .split( "\n" )                                //> inputLines  : Array[String] = Array(21, 0 1, 0 8, 0 15, 1 2, 1 5, 2 3, 2 4,
-                                                  //|  5 6, 5 7, 8 9, 8 12, 9 10, 9 11, 12 13, 12 14, 15 16, 15 19, 16 17, 16 18,
-                                                  //|  19 20, 19 21)
+    .split( "\n" )                                //> inputLines  : Array[String] = Array(21, 0 1, 0 8, 0 15, 1 2, 1 5, 2 3, 2 4
+                                                  //| , 5 6, 5 7, 8 9, 8 12, 9 10, 9 11, 12 13, 12 14, 15 16, 15 19, 16 17, 16 1
+                                                  //| 8, 19 20, 19 21)
 
   edgesFrom_test3.size                            //> res33: Int = 106
   val edgesNumber = inputLines( 0 ).split( " " )( 0 ).toInt
@@ -419,20 +425,408 @@ object treeFromLinkedListsTest {
     loop( edgesRemains = edges )
   }                                               //> fillTreeArray: (edges: Seq[(Int, Int)])Seq[advertisingSpread.treeFromLinke
                                                   //| dListsTest.Edges]
+
+  /*no extra lines with edges number / sequence size*/
+  val n = edgesUnsorted.size                      //> n  : Int = 13
+  /*? top common 'root' ?*/
+  val emptyEdge: Edge = //new Edge()
+    Edge(
+      Prev = -1,
+      Current = -1,
+      Next = -1,
+      CurrentHeight = 0,
+      CurrentRank = 0 )                           //> emptyEdge  : advertisingSpread.treeFromLinkedListsTest.Edge = {p:-1,C:-1,n
+                                                  //| :-1,h:0,R:0}
+
+  var treeMap: Map[ Int, Edge ] = Map() //Map.empty
+                                                  //> treeMap  : Map[Int,advertisingSpread.treeFromLinkedListsTest.Edge] = Map()
+                                                  //| 
+  //(someParentNode,middleNode,someNextNode,optimalHeight,optimalRank)
+  var middleEdge: Edge = Edge(
+    Prev = -1,
+    Current = -1,
+    Next = -1,
+    CurrentHeight = 0,
+    CurrentRank = 0 )                             //> middleEdge  : advertisingSpread.treeFromLinkedListsTest.Edge = {p:-1,C:-1,
+                                                  //| n:-1,h:0,R:0}
+  //(someParentNode,maxDistantLeaf,maxDistantLeaf,maxHeight,0)
+  var maxDistantEdge: Edge = Edge(
+    Prev = -1,
+    Current = -1,
+    Next = -1,
+    CurrentHeight = 0,
+    CurrentRank = 0 )                             //> maxDistantEdge  : advertisingSpread.treeFromLinkedListsTest.Edge = {p:-1,C
+                                                  //| :-1,n:-1,h:0,R:0}
+  var onlyOneMaxDistantEdge: Boolean = false      //> onlyOneMaxDistantEdge  : Boolean = false
+
+  /*must be done recursively
+  but stop somewhere*/
+  def updateParent( node: Edge,
+                    treeList: Map[ Int, Edge ] ): Unit /*or new 'tree'*/ = {
+    /*one possible element of Edges return or None*/
+    val parent: Edge /*Option[Edge]*/ = treeMap
+      .getOrElse( node.Prev, emptyEdge )
+
+    if ( parent == emptyEdge ) {
+      /*done
+      & exit*/
+    } else {
+      /*(1,2,2,1/*0 for root*/,0/*while no child*/)*/
+      /*single 'Next' is pointless for 'children'
+          so,
+          store only deepest one ?*/
+      if ( parent.CurrentRank - 1 < node.CurrentRank ) {
+        /*UpDate*/
+        parent.Next = node.Current
+        parent.CurrentRank = node.CurrentRank + 1
+        /*'height' changes when new ancestor(s) added*/
+        if ( parent.CurrentHeight + 1 == node.CurrentHeight ) {
+          /*stay the same*/
+        } else {
+          node.CurrentHeight = parent.CurrentHeight + 1
+          /*? all children must suffer ?
+          in due time / it they turn */
+        }
+        
+        if ( parent.Current == parent.Next ) {
+          /*common 'root'*/
+          /*done
+          & exit*/
+        } else {
+          updateParent( parent, treeList )
+        }
+      }
+
+    }
+  }                                               //> updateParent: (node: advertisingSpread.treeFromLinkedListsTest.Edge, treeL
+                                                  //| ist: Map[Int,advertisingSpread.treeFromLinkedListsTest.Edge])Unit
+
+  /*must be done recursively
+  but stop somewhere*/
+  def updateChildren( node: Edge, /*parent of one child*/
+                      treeList: Map[ Int, Edge ] ): Unit /*or new updated 'tree'*/ = {
+    /* case example:
+    S              *     E
+    0>3>4>9>15>1>6>8>7>2>5
+    (0>3>4>9>15)(>1)>14>10
+    (0>3>4>9>15)>13
+    {0>3
+    8>7>2>5}
+    ( 6, 8 ),
+    ( 15, 1 ),
+    ( 1, 14 ),
+    ( 0, 3 ),
+    ( 15, 13 ),
+    ( 9, 15 ),
+    ( 2, 5 ),
+    ( 14, 10 ),
+    ( 4, 9 ),
+    ( 7, 2 ),
+    ( 8, 7 ),
+    ( 3, 4 ),
+    ( 1, 6 )
+    steps:
+    (1)treeList(),
+        node(8 -> {p:6,C:8,n:8,h:1,R:0}),
+      no children in 'treeList'
+    (2)treeList((8 -> {p:6,C:8,n:8,h:1,R:0})),
+        node(1 -> {p:15,C:1,n:1,h:1,R:0}),
+        no children in 'treeList'
+    (3)treeList(
+	      (8 -> {p:6,C:8,n:8,h:1,R:0}),
+	      (1 -> {p:15,C:1,n:14,h:2,R:1})),/*updated*/
+      node(14 -> {p:1,C:14,n:14,h:3,R:0}),/*updated*/
+      no children in 'treeList',
+      has parent in 'treeList'
+    (4)treeList(
+      (8 -> {p:6,C:8,n:8,h:1,R:0}),
+      (1 -> {p:15,C:1,n:14,h:2,R:1}),
+      (14 -> {p:1,C:14,n:14,h:3,R:0})),
+      node(3 -> {p:0,C:3,n:3,h:1,R:0}),
+      no children in 'treeList',
+      no parent in 'treeList'
+    (5)treeList(
+      (8 -> {p:6,C:8,n:8,h:1,R:0}),
+      (1 -> {p:15,C:1,n:14,h:2,R:1}),
+      (14 -> {p:1,C:14,n:14,h:3,R:0}),
+      (3 -> {p:0,C:3,n:3,h:1,R:0})),
+      node(13 -> {p:15,C:13,n:13,h:1,R:0}),
+      no children in 'treeList',
+      no parent in 'treeList'
+    (6)treeList(
+      (8 -> {p:6,C:8,n:8,h:1,R:0}),
+      (1 -> {p:15,C:1,n:14,h:2,R:1}),/*updated*/
+      (14 -> {p:1,C:14,n:14,h:3,R:0}),
+      (3 -> {p:0,C:3,n:3,h:1,R:0}),
+      (13 -> {p:15,C:13,n:13,h:2,R:0})),/*updated*/
+      node(15 -> {p:9,C:15,n:1/*max 'R'*/,h:1,R:2}),/*updated*/
+      has children in 'treeList',
+      no parent in 'treeList'
+    (7)treeList(
+        (8 -> {p:6,C:8,n:8,h:1,R:0}),
+	      (1 -> {p:15,C:1,n:14,h:2,R:1}),
+	      (14 -> {p:1,C:14,n:14,h:3,R:0}),
+	      (3 -> {p:0,C:3,n:3,h:1,R:0}),
+	      (13 -> {p:15,C:13,n:13,h:2,R:0}),
+	      (15 -> {p:9,C:15,n:1,h:1,R:2})),
+      node(5 -> {p:2,C:5,n:5,h:1,R:0}),
+      no children in 'treeList',
+      no parent in 'treeList'
+    (8)treeList(
+        (8 -> {p:6,C:8,n:8,h:1,R:0}),
+	      (1 -> {p:15,C:1,n:14,h:2,R:1}),
+	      (14 -> {p:1,C:14,n:10,h:3,R:1}),/*Updated*/
+	      (3 -> {p:0,C:3,n:3,h:1,R:0}),
+	      (13 -> {p:15,C:13,n:13,h:2,R:0}),
+	      (15 -> {p:9,C:15,n:1,h:1,R:2}),
+	      (5 -> {p:2,C:5,n:5,h:1,R:0})),
+      node(10 -> {p:14,C:10,n:10,h:4,R:0}),/*updated*/
+      no children in 'treeList',
+      has parent in 'treeList'
+    (9)treeList(
+        (8 -> {p:6,C:8,n:8,h:1,R:0}),
+	      (1 -> {p:15,C:1,n:14,h:3,R:2}),/*updated*/
+	      (14 -> {p:1,C:14,n:10,h:4,R:1}),/*updated*/
+	      (3 -> {p:0,C:3,n:3,h:1,R:0}),
+	      (13 -> {p:15,C:13,n:13,h:2,R:0}),
+	      (15 -> {p:9,C:15,n:1,h:2,R:3}),/*updated*/
+	      (5 -> {p:2,C:5,n:5,h:1,R:0}),
+	      (10 -> {p:14,C:10,n:10,h:5,R:0})),/*updated*/
+      node(9 -> {p:4,C:9,n:15,h:1,R:4}),/*updated*/
+      no parent in 'treeList'
+      has children in 'treeList',
+    (10)treeList(
+        (8 -> {p:6,C:8,n:8,h:1,R:0}),
+	      (1 -> {p:15,C:1,n:14,h:3,R:2}),
+	      (14 -> {p:1,C:14,n:10,h:4,R:1}),
+	      (3 -> {p:0,C:3,n:3,h:1,R:0}),
+	      (13 -> {p:15,C:13,n:13,h:2,R:0}),
+	      (15 -> {p:9,C:15,n:1,h:2,R:3}),
+	      (5 -> {p:2,C:5,n:5,h:2,R:0}),/*updated*/
+	      (10 -> {p:14,C:10,n:10,h:5,R:0}),
+	      (9 -> {p:4,C:9,n:15,h:1,R:4})),
+      node(2 -> {p:7,C:2,n:5,h:1,R:1}),/*updated*/
+      no parent in 'treeList',
+      has children in 'treeList'
+    (11)treeList(
+        (8 -> {p:6,C:8,n:7,h:1,R:1}),/*updated*/
+	      (1 -> {p:15,C:1,n:14,h:3,R:2}),
+	      (14 -> {p:1,C:14,n:10,h:4,R:1}),
+	      (3 -> {p:0,C:3,n:3,h:1,R:0}),
+	      (13 -> {p:15,C:13,n:13,h:2,R:0}),
+	      (15 -> {p:9,C:15,n:1,h:2,R:3}),
+	      (5 -> {p:2,C:5,n:5,h:4,R:0}),/*updated*/
+	      (10 -> {p:14,C:10,n:10,h:5,R:0}),
+	      (9 -> {p:4,C:9,n:15,h:1,R:4}),
+	      (2 -> {p:7,C:2,n:5,h:3,R:1})),/*updated*/
+      node(7 -> {p:8,C:7,n:7,h:2,R:2}),/*updated*/
+      has parent in 'treeList',
+      has children in 'treeList'
+    (12)treeList(
+        (8 -> {p:6,C:8,n:7,h:1,R:1}),
+	      (1 -> {p:15,C:1,n:14,h:5,R:2}),/*updated*/
+	      (14 -> {p:1,C:14,n:10,h:6,R:1}),/*updated*/
+	      (3 -> {p:0,C:3,n:4,h:1,R:1}),/*updated*/
+	      (13 -> {p:15,C:13,n:13,h:2,R:0}),
+	      (15 -> {p:9,C:15,n:1,h:4,R:3}),/*updated*/
+	      (5 -> {p:2,C:5,n:5,h:4,R:0}),
+	      (10 -> {p:14,C:10,n:10,h:7,R:0}),/*updated*/
+	      (9 -> {p:4,C:9,n:15,h:3,R:4}),/*updated*/
+	      (2 -> {p:7,C:2,n:5,h:3,R:1}),
+	      (7 -> {p:8,C:7,n:7,h:2,R:2})),
+      node(4 -> {p:3,C:4,n:9,h:2,R:5}),/*updated*/
+      has parent in 'treeList',
+      has children in 'treeList'
+    (13)treeList(
+        (8 -> {p:6,C:8,n:7,h:7,R:3}),/*updated*/
+	      (1 -> {p:15,C:1,n:6/*new max*/,h:5,R:5/*max R*/}),/*updated*/
+	      (14 -> {p:1,C:14,n:10,h:6,R:1}),
+	      (3 -> {p:0,C:3,n:4,h:1,R:9}),/*updated*/
+	      (13 -> {p:15,C:13,n:13,h:2,R:0}),
+	      (15 -> {p:9,C:15,n:1,h:4,R:6}),/*updated*/
+	      (5 -> {p:2,C:5,n:5,h:4,R:0}),
+	      (10 -> {p:14,C:10,n:10,h:7,R:0}),
+	      (9 -> {p:4,C:9,n:15,h:3,R:7}),/*updated*/
+	      (2 -> {p:7,C:2,n:5,h:3,R:1}),
+	      (7 -> {p:8,C:7,n:7,h:8,R:2}),/*updated*/
+	      (4 -> {p:3,C:4,n:9,h:2,R:8})),/*updated*/
+      node(6 -> {p:1,C:6,n:8,h:6,R:4}),/*updated*/
+      has parent in 'treeList',
+      has children in 'treeList'
+    */
+    
+    /*cycle trough 'treeList'
+    check conditions
+    update elements
+    as side effect
+    or
+    return
+    new updated 'tree'*/
+    def loop( parent: Edge,
+      remainingNodes: Map[ Int, Edge ],
+      cildrenList: List[Edge]): List[Edge] = {
+      
+      //if (cildrenList.isEmpty) {
+      if (remainingNodes.isEmpty) {
+        cildrenList
+      } else {
+	      loop(parent, remainingNodes.tail, cildrenList.tail)
+      }
+    }
+                      
+                      
+    /*one possible element of Edges return or None*/
+    val child: Edge /*Option[Edge]*/ = treeMap
+      .getOrElse( node.Prev, emptyEdge )
+
+    /*must check all nodes with 'node.Current' as '.Prev'*/
+    /*if cildrenList.size > 0 then
+    for each element in list do
+    'updateChild'*/
+    /*val childrenList =
+      treeMap
+        .values
+          .filter { x => x.Prev == mapValue.Current }*/
+                                                    
+    /*val child1 = childrenList.head
+                                                    
+    /*child update*/
+    child1.CurrentHeight += 1
+    treeMap( 1 )*/
+        
+    if ( child == emptyEdge ) {
+      /*done
+      & exit*/
+    } else {
+      /*(1,2,2,1/*0 for root*/,0/*while no child*/)*/
+      /*single 'Next' is pointless for 'children'
+          so,
+          store only deepest one ?*/
+      if ( child.CurrentRank - 1 < node.CurrentRank ) {
+        /*UpDate*/
+        child.Next = node.Current
+        child.CurrentRank = node.CurrentRank + 1
+        /*'height' changes when new ancestor(s) added*/
+        if ( child.Current == child.Next ) {
+          /*common 'root'*/
+          /*done
+          & exit*/
+        } else {
+          //updateParent( child, treeList )
+        }
+      }
+
+    }
+  }                                               //> updateChildren: (node: advertisingSpread.treeFromLinkedListsTest.Edge, tre
+                                                  //| eList: Map[Int,advertisingSpread.treeFromLinkedListsTest.Edge])Unit
+
+  for ( i <- 0 until n ) {
+    val mapValue: Edge = Edge(
+      Prev = edgesUnsorted( i )._1,
+      Current = edgesUnsorted( i )._2,
+      Next = edgesUnsorted( i )._2,
+      CurrentHeight = 1 /*as has 'parent'*/ ,
+      CurrentRank = 0 /*as for 'leaf'*/ )
+
+    /*Traversal*/
+    //treeMap.getOrElse( mapValue.Prev, None )
+    /*Updates
+	  consequent / cascade*/
+    /*if 'child / Next' found then*/
+    //mapValue.Next = 8
+    /*same for current node*/
+    //mapValue.CurrentHeight += 1
+    /*max from existing children*/
+    //mapValue.CurrentRank += 1
+    
+    /*single chain*/
+    updateParent( mapValue, treeMap )/*work ?*/
+
+	  /*if cildrenList.size > 0 then
+	  for each element in list do
+	  'updateChild'*/
+	  /*val childrenList =
+	    treeMap
+	      .values
+	        .filter { x => x.Prev == mapValue.Current }*/
+	                                                  
+	  /*val child1 = childrenList.head
+	                                                  
+	  /*child update*/
+	  child1.CurrentHeight += 1
+	  treeMap( 1 )*/
+	  
+	  /*many branches possible*/
+    updateChildren( mapValue, treeMap )
+  
+    if ( mapValue.CurrentHeight > maxDistantEdge.CurrentHeight ) {
+      /*new leader*/
+      maxDistantEdge = mapValue
+      onlyOneMaxDistantEdge = true
+    } else if ( mapValue.CurrentHeight == maxDistantEdge.CurrentHeight ) {
+      onlyOneMaxDistantEdge = false
+    } else {
+      /*may be it is 'middleEdge' ?*/
+      /*'Rank' = treeHeight / 2 or maxLeafHeight / 2
+       or
+      'Height' = rootRank / 2 or maxNodeRank / 2*/
+      if ( mapValue.CurrentRank / 2 == maxDistantEdge.CurrentHeight / 2 ) {
+        middleEdge = mapValue
+      }
+    }
+    /*add new 'edge'*/
+    treeMap += (
+      mapValue.Current -> mapValue )
+  }
+  /*treeMap.head
+  treeMap.last
+  treeMap.getOrElse( 1, None )
+  treeMap.getOrElse( 14, None )
+  treeMap.getOrElse( 6, None )*/
+  onlyOneMaxDistantEdge                           //> res36: Boolean = true
+  middleEdge                                      //> res37: advertisingSpread.treeFromLinkedListsTest.Edge = {p:-1,C:-1,n:-1,h:
+                                                  //| 0,R:0}
+  maxDistantEdge                                  //> res38: advertisingSpread.treeFromLinkedListsTest.Edge = {p:14,C:10,n:10,h:
+                                                  //| 3,R:0}
+  println( treeMap )                              //> Map(5 -> {p:2,C:5,n:5,h:1,R:0}, 10 -> {p:14,C:10,n:10,h:3,R:0}, 14 -> {p:1
+                                                  //| ,C:14,n:10,h:2,R:1}, 1 -> {p:15,C:1,n:14,h:2,R:2}, 6 -> {p:1,C:6,n:6,h:1,R
+                                                  //| :0}, 9 -> {p:4,C:9,n:9,h:1,R:0}, 13 -> {p:15,C:13,n:13,h:1,R:0}, 2 -> {p:7
+                                                  //| ,C:2,n:2,h:1,R:0}, 7 -> {p:8,C:7,n:7,h:2,R:0}, 3 -> {p:0,C:3,n:4,h:1,R:1},
+                                                  //|  8 -> {p:6,C:8,n:7,h:1,R:1}, 4 -> {p:3,C:4,n:4,h:2,R:0}, 15 -> {p:9,C:15,n
+                                                  //| :1,h:1,R:3})
+  /*same parent
+  affect children height*/
+  treeMap( 15 )                                   //> res39: advertisingSpread.treeFromLinkedListsTest.Edge = {p:9,C:15,n:1,h:1,
+                                                  //| R:3}
+  /*if cildrenList.size > 0 then
+  for each element in list do
+  'updateChild'*/
+  val childrenList =
+    treeMap
+      .values
+        .filter { x => x.Prev == 15 }             //> childrenList  : Iterable[advertisingSpread.treeFromLinkedListsTest.Edge] =
+                                                  //|  List({p:15,C:1,n:14,h:2,R:2}, {p:15,C:13,n:13,h:1,R:0})
+  val child1 = childrenList.head                  //> child1  : advertisingSpread.treeFromLinkedListsTest.Edge = {p:15,C:1,n:14,
+                                                  //| h:2,R:2}
+  /**child update*/
+  child1.CurrentHeight += 1
+  treeMap( 1 )                                    //> res40: advertisingSpread.treeFromLinkedListsTest.Edge = {p:15,C:1,n:14,h:3
+                                                  //| ,R:2}
+  
   lazy val tree1 = fillTreeArray( inputArray1 )   //> tree1: => Seq[advertisingSpread.treeFromLinkedListsTest.Edges]
-  tree1.head                                      //> res36: advertisingSpread.treeFromLinkedListsTest.Edges = Edges(true,None,S
+  tree1.head                                      //> res41: advertisingSpread.treeFromLinkedListsTest.Edges = Edges(true,None,S
                                                   //| ome(15),Some(19),Some(21),1,true)
-  tree1.last                                      //> res37: advertisingSpread.treeFromLinkedListsTest.Edges = Edges(true,None,N
+  tree1.last                                      //> res42: advertisingSpread.treeFromLinkedListsTest.Edges = Edges(true,None,N
                                                   //| one,Some(0),Some(1),1,true)
   lazy val tree2 = fillTreeArray( edgesUnsorted ) //> tree2: => Seq[advertisingSpread.treeFromLinkedListsTest.Edges]
-  tree2.head                                      //> res38: advertisingSpread.treeFromLinkedListsTest.Edges = Edges(true,None,S
+  tree2.head                                      //> res43: advertisingSpread.treeFromLinkedListsTest.Edges = Edges(true,None,S
                                                   //| ome(15),Some(1),Some(6),1,true)
-  tree2.last                                      //> res39: advertisingSpread.treeFromLinkedListsTest.Edges = Edges(true,None,N
+  tree2.last                                      //> res44: advertisingSpread.treeFromLinkedListsTest.Edges = Edges(true,None,N
                                                   //| one,Some(6),Some(8),1,true)
-  tree2.size                                      //> res40: Int = 13
-  tree2( 0 )                                      //> res41: advertisingSpread.treeFromLinkedListsTest.Edges = Edges(true,None,S
+  tree2.size                                      //> res45: Int = 13
+  tree2( 0 )                                      //> res46: advertisingSpread.treeFromLinkedListsTest.Edges = Edges(true,None,S
                                                   //| ome(15),Some(1),Some(6),1,true)
-  tree2( 12 )                                     //> res42: advertisingSpread.treeFromLinkedListsTest.Edges = Edges(true,None,N
+  tree2( 12 )                                     //> res47: advertisingSpread.treeFromLinkedListsTest.Edges = Edges(true,None,N
                                                   //| one,Some(6),Some(8),1,true)
   /*reassigment,
   so
@@ -452,13 +846,13 @@ object treeFromLinkedListsTest {
   //t2Array(12).height = 2
 
   tree2.find( ( elem: Edges ) => elem.Child == Some( 8 ) )
-                                                  //> res43: Option[advertisingSpread.treeFromLinkedListsTest.Edges] = Some(Edge
+                                                  //> res48: Option[advertisingSpread.treeFromLinkedListsTest.Edges] = Some(Edge
                                                   //| s(true,None,None,Some(6),Some(8),1,true))
   tree2.find( ( elem: Edges ) => elem.Child == Some( 5 ) )
-                                                  //> res44: Option[advertisingSpread.treeFromLinkedListsTest.Edges] = Some(Edge
+                                                  //> res49: Option[advertisingSpread.treeFromLinkedListsTest.Edges] = Some(Edge
                                                   //| s(true,None,None,Some(2),Some(5),1,true))
   tree2.find( ( elem: Edges ) => elem.Child == Some( 0 ) )
-                                                  //> res45: Option[advertisingSpread.treeFromLinkedListsTest.Edges] = None
+                                                  //> res50: Option[advertisingSpread.treeFromLinkedListsTest.Edges] = None
 
   val Edges0: Edges = new Edges( true,
     None /*Int.в*/ ,
@@ -478,27 +872,27 @@ object treeFromLinkedListsTest {
     Current = 6,
     Next = 6,
     CurrentHeight = 1,
-    CurrentRank = 0 )                             //> mapValue6  : advertisingSpread.treeFromLinkedListsTest.Edge = Edge(1,6,6,1
-                                                  //| ,0)
+    CurrentRank = 0 )                             //> mapValue6  : advertisingSpread.treeFromLinkedListsTest.Edge = {p:1,C:6,n:6
+                                                  //| ,h:1,R:0}
 
   val mapValue8: Edge = Edge(
     Prev = 6,
     Current = 8,
     Next = 8,
-    CurrentHeight = 1 )                           //> mapValue8  : advertisingSpread.treeFromLinkedListsTest.Edge = Edge(6,8,8,1
-                                                  //| ,0)
-  mapValue.head                                   //> res46: _$1 = true
-  mapValue( 3 )                                   //> res47: _$1 = Some(2)
-  mapValue6.Current                               //> res48: Int = 6
+    CurrentHeight = 1 )                           //> mapValue8  : advertisingSpread.treeFromLinkedListsTest.Edge = {p:6,C:8,n:8
+                                                  //| ,h:1,R:0}
+  mapValue.head                                   //> res51: _$1 = true
+  mapValue( 3 )                                   //> res52: _$1 = Some(2)
+  mapValue6.Current                               //> res53: Int = 6
   //mapValue2.head.isLeaf = false
-  mapValue6.Prev == mapValue6.Current             //> res49: Boolean = false
-  mapValue6.Next == mapValue6.Current             //> res50: Boolean = true
+  mapValue6.Prev == mapValue6.Current             //> res54: Boolean = false
+  mapValue6.Next == mapValue6.Current             //> res55: Boolean = true
   /**add new 'edge'*/
   val treeFrom1To8 = Map(
     mapValue6.Current -> mapValue6 ) +
     ( mapValue8.Current -> mapValue8 )            //> treeFrom1To8  : scala.collection.immutable.Map[Int,advertisingSpread.treeF
-                                                  //| romLinkedListsTest.Edge] = Map(6 -> Edge(1,6,6,1,0), 8 -> Edge(6,8,8,1,0))
-                                                  //| 
+                                                  //| romLinkedListsTest.Edge] = Map(6 -> {p:1,C:6,n:6,h:1,R:0}, 8 -> {p:6,C:8,n
+                                                  //| :8,h:1,R:0})
   /*
   first value in Pair / Edge as 'root' or
   'parent node' may has many repeated occurences
@@ -509,20 +903,24 @@ object treeFromLinkedListsTest {
   /*then
   'leaf' point to his 'root'*/
   /**Traversal*/
-  treeFrom1To8( 6 )                               //> res51: advertisingSpread.treeFromLinkedListsTest.Edge = Edge(1,6,6,1,0)
-  treeFrom1To8( 8 )                               //> res52: advertisingSpread.treeFromLinkedListsTest.Edge = Edge(6,8,8,1,0)
+  treeFrom1To8( 6 )                               //> res56: advertisingSpread.treeFromLinkedListsTest.Edge = {p:1,C:6,n:6,h:1,R
+                                                  //| :0}
+  treeFrom1To8( 8 )                               //> res57: advertisingSpread.treeFromLinkedListsTest.Edge = {p:6,C:8,n:8,h:1,R
+                                                  //| :0}
   /**Update*/
   treeFrom1To8( 6 ).Next = 8
   treeFrom1To8( 8 ).CurrentHeight += 1
   treeFrom1To8( 8 ).CurrentRank += 1
   /*parent for '8'
   'Prev == 6'*/
-  treeFrom1To8( 6 )                               //> res53: advertisingSpread.treeFromLinkedListsTest.Edge = Edge(1,6,8,1,0)
+  treeFrom1To8( 6 )                               //> res58: advertisingSpread.treeFromLinkedListsTest.Edge = {p:1,C:6,n:8,h:1,R
+                                                  //| :0}
   /*parent for 'leaf' ?
   child for '6'
   'Next == 8'*/
-  treeFrom1To8( 8 )                               //> res54: advertisingSpread.treeFromLinkedListsTest.Edge = Edge(6,8,8,2,1)
+  treeFrom1To8( 8 )                               //> res59: advertisingSpread.treeFromLinkedListsTest.Edge = {p:6,C:8,n:8,h:2,R
+                                                  //| :1}
   /*for tree 'root'
   when all edges added from input*/
-  treeFrom1To8.getOrElse( 1, None )               //> res55: Product with Serializable = None
+  treeFrom1To8.getOrElse( 1, None )               //> res60: Product with Serializable = None
 }

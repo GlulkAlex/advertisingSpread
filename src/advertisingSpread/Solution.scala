@@ -79,6 +79,40 @@ import scala.io.Source
   * from this 'node'
   * where 'node' is 'root' of subtree)
   */
+  /* Possibly,
+   * 'minimal possible maximum distance'
+   * may be obtained / gained / achieved / returned
+   * at the end of input / data structure initialization
+   * if maintained additional / auxiliary 
+   * variables such as
+   * 'middleEdge(someParentNode,middleNode,someNextNode,optimalHeight,optimalRank)'
+   * and
+   * 'maxDistantEdge(someParentNode,maxDistantLeaf,maxDistantLeaf,maxHeight,0)'
+   * When
+   * exist single 'maxDistantEdge' not equal to
+   * others 'leafs' depth / height / distance
+   * Note:
+   *  question is not about 'single / one & only' 'maxDistantEdge'
+   *  but
+   *  about existence 'optimal fork' below 'root'
+   *  such as 
+   *  no 'fork' before present / single chain to root without branching
+   * or 
+   * ? still needed to check ?
+   * if 'root' is the 'optimal node' & 
+   * respectively has
+   * 'optimalHeight'
+   * 
+   * As if only two cases possible
+   * either  'optimal node' is 
+   * 'root' or
+   * 'fork' as 'subtree root' not equal to 'tree root'
+   * 'optimal node' lays within / on path to 'maxDistantLeaf'
+   * 
+   * 'onlyOneMaxDistantLeaf' state / flag
+   * may be traced too &
+   * be known at the end of input
+   * */
 
 /*description:
 codingame.com Sponsored Challenge from Teads
