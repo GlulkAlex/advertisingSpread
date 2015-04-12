@@ -496,4 +496,13 @@ object treeMapsTest {
   }
   
   val testTreeNodeMap: TreeNodeMap = new TreeNodeMap(1->emptyNode)*/
+  val empty1 = emptyNode                          //> empty1  : advertisingSpread.treeMapsTest.Node = {val:-1,h:0,R:0}
+  val empty2 = emptyNode                          //> empty2  : advertisingSpread.treeMapsTest.Node = {val:-1,h:0,R:0}
+  
+  empty2 == empty1                                //> res15: Boolean = true
+  empty2 eq empty1                                //> res16: Boolean = true
+  empty2 == empty2                                //> res17: Boolean = true
+  empty2 eq empty2                                //> res18: Boolean = true
+  
+  
 }

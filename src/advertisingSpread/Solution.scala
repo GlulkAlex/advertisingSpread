@@ -416,11 +416,11 @@ object Solution {
     override def toString() = "{" +
       "Prv" + this.Parent +
       "[" + this.Value +
-      "]Nxt" + this.Children.mkString("(", ",", ")") +
+      "]Nxt" + this.Children.mkString( "(", ",", ")" ) +
       "h" + this.CurrentHeight +
       "R" + this.CurrentRank + "}"
   }
-  
+
   case class Edge( Start: Int = -1,
                    End: Int = -1 ) {
     override def toString() = "{from:" + this.Start +
@@ -434,11 +434,11 @@ object Solution {
   /*first node with more then one child or
   parent of two or more nodes with
   same height &
-  that hegith mast be as minimal as possible
+  that height mast be as minimal as possible
   if single chain line with no branches at all then
   element with '0' height aka 'root'*/
-  def firstFork( rankedTree: Map[ Int, Node ],
-                 edgesMap: Map[ Int, Edge ] ): Node = {
+  def firstTreeFork( rankedTree: Map[ Int, Node ]/*,
+                 edgesMap: Map[ Int, Edge ]*/ ): Node = {
 
     /*expensive*/
     /*if do inverse ?
@@ -447,11 +447,14 @@ object Solution {
      * firstly sort by decreasing 'rank' then
      * check until has children >= '2'
      * */
+    /*all parents
+     * no leaf allowed*/
     lazy val fork = ( for {
       nodes <- rankedTree.values
-      if ( rankedTree.count {
+      /*if ( rankedTree.count {
         x => x._2.CurrentHeight == nodes.CurrentHeight
-      } ) > 1
+      } ) > 1*/
+      if ( nodes.Children.size > 1 )
     } yield nodes )
     //*debug
     //*println("fork:" + fork.take(3))
@@ -465,24 +468,41 @@ object Solution {
       lazy val child =
         /*'Test_6_input.txt'
          * key not found: 1036*/
-        edgesMap
-          .getOrElse(
-            /*how non empty list may fails ?*/
-            fork
-              .min( Ordering[ Int ]
-                .on( ( x: Node ) => x.CurrentHeight )
-              ).Value,
-            emptyEdge )
-      if ( child == emptyEdge ) {
+        //*rankedTree
+        //*edgesMap
+        //*.getOrElse(
+        /*how non empty list may fails ?*/
+        fork
+          /*or max 'rank'*/
+          .min( Ordering[ Int ]
+            .on( ( x: Node ) => x.CurrentHeight )
+          )
+      //*.Value,
+      /*emptyEdge*/ //*emptyNode )
+
+      /*? always 'false' for case classes ?*/
+      /*as checked same as 'eq'*/
+      if ( child == /*emptyEdge*/ emptyNode ) {
         //*debug
         println( "Warning! 'fork' fails !\n" +
           "fork.size is:" + fork.size + "\n" +
           "fork.take(3) is:" + fork.take( 3 ) )
-        emptyNode
+        //*emptyNode
+        child
       } else {
-        rankedTree( child.Start )
+        /*redundant step ?*/
+        /*? & if it is 'root' ?*/
+        //*if (child.Parent == -1 ) {
+        /*done & return*/
+        //*emptyNode
+        //*} else {
+        //*rankedTree( child.Start )
+        //*rankedTree( child.Parent )
+        //*}
+        child
       }
-    } else {
+    } else { /*'fork' fails
+    top node ?*/
       if ( rankedTree.size > 0 ) {
         rankedTree
           .values
@@ -497,8 +517,8 @@ object Solution {
   } /*works*/
 
   /*'rankedTree' & 'edgesMap' is not empty*/
-  def rankFork( rankedTree: Map[ Int, Node ],
-                edgesMap: Map[ Int, Edge ] ): Node = {
+  def rankFork( rankedTree: Map[ Int, Node ]/*,
+                edgesMap: Map[ Int, Edge ]*/ ): Node = {
     /*'Map' is unsorted*/
     val rankSortedTree = rankedTree
       .values
@@ -537,7 +557,9 @@ object Solution {
   /** compares:
     * rootNode &
     * firstFork (may be same as 'root') &
-    * optimalNode (if exist, must be if .size > 1)
+    * optimalNode (if exist,
+    * must be if .size > 1 &
+    * 'optimalNode.rank + height == rootNode.rank')
     */
   def optimalDistance( root: Node,
                        firstFork: Node,
@@ -559,11 +581,19 @@ object Solution {
     } else {
       val forkPath = firstFork.CurrentRank max firstFork.CurrentHeight
 
-      if ( optimalNode.CurrentRank - optimalNode.CurrentHeight <= 1 ) {
+      /*'optimalNode.rank + height == rootNode.rank'*/
+      if ( Math.abs(optimalNode.CurrentRank - optimalNode.CurrentHeight) <= 1 &&
+          optimalNode.CurrentRank + optimalNode.CurrentHeight == root.CurrentRank ) {
         /*Math.max(optimalNode.CurrentRank, optimalNode.CurrentHeight)*/
         val optimalPath = optimalNode.CurrentRank max optimalNode.CurrentHeight
         //optimalPath = Math.max(optimalNode.CurrentRank, optimalNode.CurrentHeight)
         optimalPath
+      } else  if ( Math.abs(optimalNode.CurrentRank - optimalNode.CurrentHeight) <= 1 &&
+        optimalNode.CurrentRank + optimalNode.CurrentHeight != root.CurrentRank ) {
+        /*not optimal
+         * search must be continued */
+        println("!Warning! Unexpected happends!")
+        root.CurrentRank / 2
       } else {
         forkPath //*.toInt
       }
@@ -582,7 +612,7 @@ object Solution {
   /**propagate 'Height' down to subtree*/
   def subTreeHeightUpdate( parent: Int,
                            parentHeight: Int,
-                           edgesMap: Map[ Int, Edge ],
+                           //*edgesMap: Map[ Int, Edge ],
                            nodesMap: Map[ Int, Node ],
                            parentNode: Node = emptyNode ): Unit = {
     if ( parentNode.Children.nonEmpty ) {
@@ -593,6 +623,8 @@ object Solution {
         .values
         .filter { x => x.Start == parent }*/
 
+        /*somewhere in the process
+         * 'baseHeight' was lost*/
         def innerLoop( childrenLeft: /*Iterable [ Edge ]*/ List[ Int ],
                        baseHeight: Int ): /*Iterable [ Edge ]*/ List[ Int ] = {
           if ( childrenLeft.isEmpty ) {
@@ -603,12 +635,13 @@ object Solution {
             /*must be in 'nodesMap' already*/
             val child = nodesMap( childrenLeft.head /*.End */ )
 
-            if ( child.CurrentHeight < parentHeight + 1 ) {
-              child.CurrentHeight = parentHeight + 1
-              
+            if ( child.CurrentHeight < /*parentHeight*/ baseHeight + 1 ) {
+              child.CurrentHeight = /*parentHeight*/ baseHeight + 1
+
               /*what if fails ?*/
               //*if ( child.CurrentRank == 0 ) {
-          	  if ( child.Children.isEmpty ) {
+              if ( child.Children.isEmpty ) {
+                /*just to be sure*/
                 child.CurrentRank = 0
                 /*done & next*/
               } else {
@@ -617,20 +650,20 @@ object Solution {
                 /*propagate 'Height' down to subtree*/
                 subTreeHeightUpdate( child.Value,
                   child.CurrentHeight,
-                  edgesMap,
+                  //*edgesMap,
                   nodesMap )
               }
 
               //innerLoop( childrenLeft.tail, parentHeight )
             } else {
-            	/*done & next*/
+              /*done & next*/
             }
             /*next in list*/
             /*forward reference extends over
             definition of value 'childrenList'
             solution:
             val childrenList must be declared first*/
-            innerLoop( childrenLeft.tail, parentHeight )
+            innerLoop( childrenLeft.tail, /*parentHeight*/ baseHeight )
           }
         }
 
@@ -641,9 +674,11 @@ object Solution {
         /*initialization*/
         innerLoop( childrenList, parentHeight )
       }
+    } else {
+      /*done & return*/
     }
     //if (nodesMap( start ).CurrentHeight)
-  } /*work                                        //> subTreeHeightUpdate: (parent: Int, parentHeight: Int)Unit
+  } /*work                                      
   & possibly like expected*/
 
   /*find 
@@ -733,13 +768,13 @@ object Solution {
   /*if leaf then
    * has no children then
    * 'rank' == 0
-   * */             
+   * */
   /** rankIncrement
     * by '+1' from child
     */
   def parentRankUpdate( parent: Int, /*start*/
                         childRank: Int, /* = 0*/ /*end.rank*/
-                        edgesMap: Map[ Int, Edge ],
+                        //*edgesMap: Map[ Int, Edge ],
                         nodesMap: Map[ Int, Node ] ): Unit = {
 
     /*if ( childRank == -1 ) {
@@ -752,6 +787,7 @@ object Solution {
     if ( nodeParent == emptyNode ) {
       /*done & return*/
     } else {
+      /*for example '2 > 0 + 1' */
       if ( nodeParent.CurrentRank > childRank + 1 ) {
         /*done & return*/
       } else {
@@ -760,11 +796,14 @@ object Solution {
         /*val nextParent0: Edge =
           edgesMap
             .getOrElse( parent /*as 'end'*/ , emptyEdge )*/
+        /*to skip default '-1'*/
         val nextParent: Node = if ( nodeParent.Parent == -1 ) {
           emptyNode
         } else {
           //nodeParent.Parent.get
-          nodesMap( nodeParent.Parent )
+          /*& if it fails to 'get' ?*/
+          //*nodesMap( nodeParent.Parent )
+          nodesMap.getOrElse( nodeParent.Parent, emptyNode )
         }
         /*nodeParent
           .Parent
@@ -777,13 +816,13 @@ object Solution {
           /*recursion*/
           parentRankUpdate( nextParent.Value /*Start*/ ,
             nodeParent.CurrentRank,
-            edgesMap,
+            //*edgesMap,
             nodesMap )
         }
       }
     }
     //*}
-  } /*works                                       //> parentRankUpdate: (parent: Int, childRank: Int)Unit
+  } /*works          
   as expected
   when added where needed*/
 
@@ -840,7 +879,7 @@ object Solution {
       new Array[ ( Int, Int ) ]( n )
     /*val leafsArray = new Array[ Int ]( n )*/
 
-    var edgesMap: Map[ Int, Edge ] = Map()
+    //*var edgesMap: Map[ Int, Edge ] = Map()
     var nodesMap: Map[ Int, Node ] = Map.empty[ Int, Node ]
 
     var oldOptimum = emptyNode
@@ -901,6 +940,7 @@ object Solution {
           CurrentRank = 0 ) )
       } else if ( nodesMapStart != /*None*/ emptyNode &&
         nodesMapEnd == /*None*/ emptyNode ) {
+        /*new 'child' to existing 'node'*/
         nodesMap += ( end -> Node(
           Parent = start,
           Value = end,
@@ -916,11 +956,13 @@ object Solution {
         /*'+:=' add new to existing / preserve values*/
         nodesMapStart.Children +:= end
         parentRankUpdate( /*as edge end*/ start,
-          0,
-          edgesMap,
+          /*passing new 'children' 'rank'*/
+          0, /*???*/
+          //*edgesMap,
           nodesMap )
       } else if ( nodesMapStart == /*None*/ emptyNode &&
         nodesMapEnd != /*None*/ emptyNode ) {
+        /*new 'root' to existing 'node'*/
         nodesMap += ( start -> Node(
           Children = List( end ),
           Value = start,
@@ -932,22 +974,26 @@ object Solution {
         subTreeHeightUpdate(
           parent = end,
           parentHeight = 0,
-          edgesMap = edgesMap,
+          //*edgesMap = edgesMap,
           nodesMap = nodesMap )
       } else if ( nodesMapStart != /*None*/ emptyNode &&
         nodesMapEnd != /*None*/ emptyNode ) {
-
+        /*new 'height' for 'nodesMapEnd'
+        *may be new 'rank' for 'nodesMapStart'
+         * */
         nodesMapStart.Children +:= end
         nodesMapEnd.Parent = start
+        //nodesMapEnd.CurrentHeight = nodesMapStart.CurrentHeight + 1
         parentRankUpdate( /*as edge end*/ start,
-          nodesMap( end ).CurrentRank,
-          edgesMap,
+          /*child rank passed to parent*/
+          nodesMapEnd.CurrentRank,
+          //*edgesMap,
           nodesMap )
         /*propagate 'Height' down to subtree*/
         /*nodesMap('start').height + 1*/
         subTreeHeightUpdate( start, /*to find all children of 'start'*/
-          nodesMap( start ).CurrentHeight,
-          edgesMap,
+          nodesMapStart.CurrentHeight,
+          //*edgesMap,
           nodesMap )
       } else {
       }
@@ -1018,16 +1064,16 @@ object Solution {
 
     /*may be evaluated in / during input
      * not after*/
-    lazy val mostDistantLeaf = nodesMap
+    /*lazy val mostDistantLeaf = nodesMap
       .values
       .max( Ordering[ Int ]
-        .on( ( x: Node ) => x.CurrentHeight ) )
-    lazy val rootNode = nodesMap
+        .on( ( x: Node ) => x.CurrentHeight ) )*/
+    /*lazy val rootNode = nodesMap
       .values
       .max( Ordering[ Int ]
-        .on( ( x: Node ) => x.CurrentRank ) )
+        .on( ( x: Node ) => x.CurrentRank ) )*/
     /*half from max possible*/
-    lazy val optimalNode = nodesMap
+    /*lazy val optimalNode = nodesMap
       .values
       .filter { x =>
         ( x.CurrentHeight == mostDistantLeaf.CurrentHeight / 2 ||
@@ -1035,22 +1081,23 @@ object Solution {
           ( x.CurrentHeight + x.CurrentRank == mostDistantLeaf.CurrentHeight ||
             x.CurrentHeight + x.CurrentRank == rootNode.CurrentRank )
       }
-      .head
-    //*lazy val fork = firstFork( nodesMap, edgesMap )
-    lazy val fork = rankFork( nodesMap, edgesMap )
+      .head*/
+    //*lazy val fFork = firstTreeFork( nodesMap/*, edgesMap */)
+    //*lazy val rFork = rankFork( nodesMap/*, edgesMap */)
 
     //*debug
-    println( "expected 'mostDistantLeaf' is: " + mostDistantLeaf )
+    /*println( "expected 'mostDistantLeaf' is: " + mostDistantLeaf )
     println( "actual 'oldDistant' is: " + oldDistant )
     println( "expected 'optimalNode' is: " + optimalNode )
     println( "actual 'oldOptimum' is: " + oldOptimum )
     println( "expected 'rootNode' is: " + rootNode )
     println( "actual 'oldRoot' is: " + oldRoot )
-    println( "expected 'fork' is: " + fork )
+    println( "expected 'rFork' is: " + rFork )
+    println( "expected 'fFork' is: " + fFork )
     println( "actual 'oldFork' is: " + oldFork )
-    println( "actual 'nodesMap' is: " + nodesMap.take(20).mkString("<", "|", ">") )
-    println( "actual 'nodesMap.size' is: " + nodesMap.size )
-    
+    println( "actual 'nodesMap' is: " + nodesMap.take( 20 ).mkString( "<", "|", ">" ) )
+    println( "actual 'nodesMap.size' is: " + nodesMap.size )*/
+
     /*return value
    * for testing*/
     optimalDistance( root = oldRoot /*rootNode*/ ,

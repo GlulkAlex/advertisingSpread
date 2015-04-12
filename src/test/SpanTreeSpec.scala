@@ -74,13 +74,13 @@ class SpanTreeSpec extends UnitSpec {
 		  inputTest( 7 )
 	  }
   }
-  "Expected test_8 result" should "return #9" ignore {
+  "Expected test_8 result" should "return #9" in {
 	  assertResult( 9 ) {
 		  inputTest( 8 )
 	  }
   }
   /*Run completed in 11 minutes, 51 seconds.*/
-  "Expected test_9 result" should "return #15" ignore {
+  "Expected test_9 result" should "return #15" in {
 	  assertResult( 15 ) {
 		  inputTest( 9 )
 	  }
