@@ -288,7 +288,7 @@ object treeMapsTest {
   }                                               //> inputTest: (inputData: Seq[(Int, Int)])Unit
 
   /**expensive*/
-	/*if do inverse ?
+  /*if do inverse ?
 	 * node with max unique height & not leaf ?
 	 * or
 	 * firstly sort by decreasing 'rank' then
@@ -308,7 +308,7 @@ object treeMapsTest {
       if ( rankedTree
         .count {
           x => x._2.CurrentHeight == nodes.CurrentHeight
-      } ) > 1
+        } ) > 1
     } yield nodes )
     //*debug
     //*println("fork:" + fork.take(3))
@@ -336,45 +336,45 @@ object treeMapsTest {
         emptyNode
       }
     }
-  }/*works*/                                      //> firstFork: (rankedTree: Map[Int,advertisingSpread.treeMapsTest.Node], edge
+  } /*works*/                                     //> firstFork: (rankedTree: Map[Int,advertisingSpread.treeMapsTest.Node], edge
                                                   //| sMap: Map[Int,advertisingSpread.treeMapsTest.Edge])advertisingSpread.treeM
                                                   //| apsTest.Node
   /*'rankedTree' & 'edgesMap' is not empty*/
   def rankFork( rankedTree: Map[ Int, Node ],
-                 edgesMap: Map[ Int, Edge ] ): Node = {
+                edgesMap: Map[ Int, Edge ] ): Node = {
     /*'Map' is unsorted*/
     val rankSortedTree = rankedTree
       .values
       .view
       .toSeq
-      .sorted ( Ordering[ Int ]
-            .reverse
-            .on( ( x: Node ) => x.CurrentRank ) )
-    /*!seq.exists(p)*/
-	  def innerLoop(nodesLeft: Seq[Node],
-	   fork: Node = emptyNode): Node =
-		   if (nodesLeft.isEmpty) {
-		     /*no garanty on value*/
-		     fork
-		     /*that is distinguishable as wrong*/
-		     emptyNode
-		   } else {
-		     /*'nodesLeft.head' as 'start' in 'edgesMap'*/
-		     /*'seq.count(p)'
+      .sorted( Ordering[ Int ]
+        .reverse
+        .on( ( x: Node ) => x.CurrentRank ) )
+      /*!seq.exists(p)*/
+      def innerLoop( nodesLeft: Seq[ Node ],
+                     fork: Node = emptyNode ): Node =
+        if ( nodesLeft.isEmpty ) {
+          /*no garanty on value*/
+          fork
+          /*that is distinguishable as wrong*/
+          emptyNode
+        } else {
+          /*'nodesLeft.head' as 'start' in 'edgesMap'*/
+          /*'seq.count(p)'
 		     faster then '.filter'*/
-		     if (edgesMap
-		       .count(x => x._2.Start == nodesLeft.head.Value) > 1) {
-		         nodesLeft.head
-		     } else {
-		       innerLoop(nodesLeft.tail,
-	           nodesLeft.head)
-		     }
-		   }
-    
+          if ( edgesMap
+            .count( x => x._2.Start == nodesLeft.head.Value ) > 1 ) {
+            nodesLeft.head
+          } else {
+            innerLoop( nodesLeft.tail,
+              nodesLeft.head )
+          }
+        }
+
     /*return value
     initializaton*/
-    innerLoop(rankSortedTree, rankSortedTree.head)
-  }/*works                                        //> rankFork: (rankedTree: Map[Int,advertisingSpread.treeMapsTest.Node], edges
+    innerLoop( rankSortedTree, rankSortedTree.head )
+  } /*works                                       //> rankFork: (rankedTree: Map[Int,advertisingSpread.treeMapsTest.Node], edges
                                                   //| Map: Map[Int,advertisingSpread.treeMapsTest.Edge])advertisingSpread.treeMa
                                                   //| psTest.Node
   but may be too slow*/
@@ -425,7 +425,7 @@ object treeMapsTest {
           x.CurrentHeight + x.CurrentRank == rootNode.CurrentRank )
     }
     .head
-    
+
   val fork = firstFork( nodesMap, edgesMap )      //> fork  : advertisingSpread.treeMapsTest.Node = {val:15,h:4,R:6}
   rankFork( nodesMap, edgesMap )                  //> res7: advertisingSpread.treeMapsTest.Node = {val:15,h:4,R:6}
 
@@ -447,15 +447,53 @@ object treeMapsTest {
         firstFork.CurrentRank max firstFork.CurrentHeight
       }
     }
-  }/*works*/                                      //> optimalDistance: (root: advertisingSpread.treeMapsTest.Node, firstFork: ad
+  } /*works*/                                     //> optimalDistance: (root: advertisingSpread.treeMapsTest.Node, firstFork: ad
                                                   //| vertisingSpread.treeMapsTest.Node, optimalNode: advertisingSpread.treeMaps
                                                   //| Test.Node)Int
 
   optimalDistance( root = rootNode,
-                       firstFork = fork,
-                       optimalNode = optimalNode )//> res8: Int = 5
-                       
+    firstFork = fork,
+    optimalNode = optimalNode )                   //> res8: Int = 5
+
   fork.CurrentRank max fork.CurrentHeight         //> res9: Int = 6
-  Math.max(optimalNode.CurrentRank, optimalNode.CurrentHeight)
+  Math.max( optimalNode.CurrentRank, optimalNode.CurrentHeight )
                                                   //> res10: Int = 5
+  /*fancy but
+  except inner scope &
+  more clear global namespace
+  what we got ?*/
+  class FieldTest( private var preservedVals: List[ Int ] = List.empty[ Int ] ) {
+    def english = "Hi"
+    def espanol = "Hola"
+    def deutsch = "Hallo"
+    def magyar = "Szia"
+    def getPreserved = this.preservedVals
+    def addToPreserved( newElem: Int ): List[ Int ] = {
+      preservedVals = newElem :: preservedVals
+
+      preservedVals
+    }
+  }
+  /*traits or objects may not have parameters*/
+  /*object FieldTest {
+    /*lame  encapsulation*/
+    //This is encapsulated!
+    var currentPreserv: List[Int] = List.empty[Int]
+  }*/
+
+  val fieldTestObj = new FieldTest                //> fieldTestObj  : advertisingSpread.treeMapsTest.FieldTest = advertisingSpre
+                                                  //| ad.treeMapsTest$$anonfun$main$1$FieldTest$2@45f292
+  fieldTestObj.espanol                            //> res11: String = Hola
+  fieldTestObj.getPreserved                       //> res12: List[Int] = List()
+  fieldTestObj.addToPreserved( 1 )                //> res13: List[Int] = List(1)
+  fieldTestObj.getPreserved                       //> res14: List[Int] = List(1)
+  //fieldTestObj.preservedVals
+  /*abstract class TreeNodeMap extends Map[ Int, Node ] {
+    override def toString() = "{" +
+      "Prev:" + this.keys +
+      ",val[" + this.values +
+      "}"
+  }
+  
+  val testTreeNodeMap: TreeNodeMap = new TreeNodeMap(1->emptyNode)*/
 }
