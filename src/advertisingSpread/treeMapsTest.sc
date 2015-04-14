@@ -498,11 +498,128 @@ object treeMapsTest {
   val testTreeNodeMap: TreeNodeMap = new TreeNodeMap(1->emptyNode)*/
   val empty1 = emptyNode                          //> empty1  : advertisingSpread.treeMapsTest.Node = {val:-1,h:0,R:0}
   val empty2 = emptyNode                          //> empty2  : advertisingSpread.treeMapsTest.Node = {val:-1,h:0,R:0}
-  
+
   empty2 == empty1                                //> res15: Boolean = true
   empty2 eq empty1                                //> res16: Boolean = true
   empty2 == empty2                                //> res17: Boolean = true
   empty2 eq empty2                                //> res18: Boolean = true
+
+  /*any good from this Luxures ?*/
+  abstract class TreeNodes
+  case class NodeChildrenSeq( elems: List[ TreeNodes ] ) extends TreeNodes
+  case class NodesMapObj( bindings: Map[ Int, TreeNodes ] ) extends TreeNodes
+  case class NodeValue( num: Int ) extends TreeNodes
+  case class RootNode( //value: NodeValue,
+    degree: Int,
+    rank: Int,
+    children: NodeChildrenSeq ) extends TreeNodes
+  case class OrdinaryNode( //value: NodeValue,
+    //prev: TreeNodes,
+    degree: Int,
+    height: Int,
+    rank: Int,
+    children: NodeChildrenSeq ) extends TreeNodes
+  case class LeafNode( //value: NodeValue,
+    //prev: TreeNodes,
+    height: Int ) extends TreeNodes
+  case object EmptyNode extends TreeNodes
+
+  /*& traversal ?*/
+  val nodesData1 = NodesMapObj(
+    Map(
+      0 -> RootNode( //NodeValue(0),
+        14,
+        10,
+        NodeChildrenSeq(
+          List(
+            NodesMapObj(
+              Map( 3 -> OrdinaryNode(
+                13, 1, 9,
+                NodeChildrenSeq(
+                  List(
+                    NodesMapObj(
+                      Map( 15 -> LeafNode( 2 ) )
+                    ),
+                    NodesMapObj(
+                      Map( 1 -> LeafNode( 2 ) )
+                    )
+                  )
+                )
+              )
+              )
+            )
+          )
+        )
+      )
+    )
+  )                                               //> nodesData1  : advertisingSpread.treeMapsTest.NodesMapObj = NodesMapObj(Map
+                                                  //| (0 -> RootNode(14,10,NodeChildrenSeq(List(NodesMapObj(Map(3 -> OrdinaryNod
+                                                  //| e(13,1,9,NodeChildrenSeq(List(NodesMapObj(Map(15 -> LeafNode(2))), NodesMa
+                                                  //| pObj(Map(1 -> LeafNode(2)))))))))))))
+  def show( treeNodes: TreeNodes ): String = treeNodes match {
+    case NodeChildrenSeq( elems ) =>
+      "[" + ( elems map show mkString ", " ) + "]"
+    case NodesMapObj( bindings ) =>
+      val assocs = bindings map {
+        case ( key, value ) => "\"" + key + "\": " + show( value )
+      }
+      "{" + ( assocs mkString ", " ) + "}"
+    case NodeValue( num ) => num.toString
+    case RootNode(
+      degree: Int,
+      rank: Int,
+      children ) => "d:" + degree +
+        ",r:" + rank + show( children )
+    case OrdinaryNode(
+      degree: Int,
+      height: Int,
+      rank: Int,
+      children ) => "d:" + degree +
+        ",h:" + height +
+        ",r:" + rank + show( children )
+    case LeafNode( height ) => "leaf:" + height
+    case EmptyNode        => "None"
+  }                                               //> show: (treeNodes: advertisingSpread.treeMapsTest.TreeNodes)String
+  
+  show( nodesData1 )                              //> res19: String = {"0": d:14,r:10[{"3": d:13,h:1,r:9[{"15": leaf:2}, {"1": l
+                                                  //| eaf:2}]}]}
+  val dummyNode = EmptyNode                       //> dummyNode  : advertisingSpread.treeMapsTest.EmptyNode.type = EmptyNode
+  
+  dummyNode == EmptyNode                          //> res20: Boolean = true
+  
+  nodesData1.bindings                             //> res21: Map[Int,advertisingSpread.treeMapsTest.TreeNodes] = Map(0 -> RootNo
+                                                  //| de(14,10,NodeChildrenSeq(List(NodesMapObj(Map(3 -> OrdinaryNode(13,1,9,Nod
+                                                  //| eChildrenSeq(List(NodesMapObj(Map(15 -> LeafNode(2))), NodesMapObj(Map(1 -
+                                                  //| > LeafNode(2))))))))))))
+  nodesData1.bindings.head                        //> res22: (Int, advertisingSpread.treeMapsTest.TreeNodes) = (0,RootNode(14,10
+                                                  //| ,NodeChildrenSeq(List(NodesMapObj(Map(3 -> OrdinaryNode(13,1,9,NodeChildre
+                                                  //| nSeq(List(NodesMapObj(Map(15 -> LeafNode(2))), NodesMapObj(Map(1 -> LeafNo
+                                                  //| de(2))))))))))))
+  nodesData1
+    .bindings(0) match
+    {
+      case x: RootNode => "RootNode"
+      case _ => "something else"
+    }                                             //> res23: String = RootNode
+  nodesData1
+    .bindings
+      .getOrElse(0, EmptyNode) match
+    {
+      case x: RootNode => "RootNode.children:" + x.children
+      case x: OrdinaryNode => "RootNode"
+      case x: LeafNode => "RootNode"
+      case x if x == EmptyNode => "EmptyNode"
+      case _ => "something else"
+    }                                             //> res24: String = RootNode.children:NodeChildrenSeq(List(NodesMapObj(Map(3 -
+                                                  //| > OrdinaryNode(13,1,9,NodeChildrenSeq(List(NodesMapObj(Map(15 -> LeafNode(
+                                                  //| 2))), NodesMapObj(Map(1 -> LeafNode(2))))))))))
+  
+  
+  
+  
+  
+  
+  
   
   
 }

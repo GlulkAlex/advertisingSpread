@@ -1,10 +1,8 @@
 package advertisingSpread
 
 import math._
-//import scala.util._
-//import scala.io.StdIn.readInt
-//import scala.io.StdIn.readLine
 import scala.io.Source
+import sun.misc.Launcher.ExtClassLoader
 
 /* may be even,
  * use 'clustering' problem approach
@@ -401,8 +399,10 @@ object Solution {
     result
   }
 
-  /*shadows existing predefined class*/
-  case class Node(
+  /*just because why not ?*/
+  abstract class TreeNodes
+  /*as 'Node' shadows existing predefined class*/
+  case class TreeNode(
     /*way too recursive
      * hard to handle
      * like new value instance for example*/
@@ -412,7 +412,8 @@ object Solution {
     var Children: List[ /*Node*/ Int ] = List.empty[ Int /*Node*/ ], /*for undefined*/
     var Value: Int = -1, /*for undefined*/
     var CurrentHeight: Int = 1, /*'0' for 'root'*/
-    var CurrentRank: Int = 0 /*'0' for 'leaf'*/ ) {
+    var CurrentRank: Int = 0, /*'0' for 'leaf'*/
+    var Degree: Int = 0 /*subTree size = root + nodes + leafs*/ ) extends TreeNodes {
     override def toString() = "{" +
       "Prv" + this.Parent +
       "[" + this.Value +
@@ -420,6 +421,10 @@ object Solution {
       "h" + this.CurrentHeight +
       "R" + this.CurrentRank + "}"
   }
+  /*not helping at all
+   * as it requires additional 
+   * pattern matching*/
+  case object EmptyNode extends TreeNodes
 
   case class Edge( Start: Int = -1,
                    End: Int = -1 ) {
@@ -428,8 +433,24 @@ object Solution {
   }
 
   /*for 'Map.getOrElse' 'default'*/
-  val emptyNode = Node( Value = -1, CurrentHeight = 0, CurrentRank = 0 )
+  val emptyNode = //EmptyNode
+    TreeNode( Value = -1, CurrentHeight = 0, CurrentRank = 0 )
   val emptyEdge = Edge( -1, -1 )
+
+  /*clear temporary values
+   * */
+  /*def resetTemporaryValues(returnResult: Int,
+      oldRoot: TreeNode,
+      oldFork: TreeNode,
+      oldOptimum: TreeNode,
+      oldDistant: TreeNode
+      ) : Int = {
+    
+    /*reassigment to 'val'*/
+	  //oldRoot = oldFork = oldOptimum = oldDistant = emptyNode
+    
+    returnResult
+  }*/
 
   /*first node with more then one child or
   parent of two or more nodes with
@@ -437,8 +458,8 @@ object Solution {
   that height mast be as minimal as possible
   if single chain line with no branches at all then
   element with '0' height aka 'root'*/
-  def firstTreeFork( rankedTree: Map[ Int, Node ]/*,
-                 edgesMap: Map[ Int, Edge ]*/ ): Node = {
+  def firstTreeFork( rankedTree: Map[ Int, TreeNode ] /*,
+                 edgesMap: Map[ Int, Edge ]*/ ): TreeNodes = {
 
     /*expensive*/
     /*if do inverse ?
@@ -475,7 +496,7 @@ object Solution {
         fork
           /*or max 'rank'*/
           .min( Ordering[ Int ]
-            .on( ( x: Node ) => x.CurrentHeight )
+            .on( ( x: TreeNode ) => x.CurrentHeight )
           )
       //*.Value,
       /*emptyEdge*/ //*emptyNode )
@@ -507,7 +528,7 @@ object Solution {
         rankedTree
           .values
           .max( Ordering[ Int ]
-            .on( ( x: Node ) => x.CurrentRank ) )
+            .on( ( x: TreeNode ) => x.CurrentRank ) )
       } else {
         //*debug
         //println("Warning! 'rankedTree' fails !")
@@ -517,8 +538,8 @@ object Solution {
   } /*works*/
 
   /*'rankedTree' & 'edgesMap' is not empty*/
-  def rankFork( rankedTree: Map[ Int, Node ]/*,
-                edgesMap: Map[ Int, Edge ]*/ ): Node = {
+  def rankFork( rankedTree: Map[ Int, TreeNode ] /*,
+                edgesMap: Map[ Int, Edge ]*/ ): TreeNode = {
     /*'Map' is unsorted*/
     val rankSortedTree = rankedTree
       .values
@@ -526,10 +547,10 @@ object Solution {
       .toSeq
       .sorted( Ordering[ Int ]
         .reverse
-        .on( ( x: Node ) => x.CurrentRank ) )
+        .on( ( x: TreeNode ) => x.CurrentRank ) )
       /*!seq.exists(p)*/
-      def innerLoop( nodesLeft: Seq[ Node ],
-                     fork: Node = emptyNode ): Node =
+      def innerLoop( nodesLeft: Seq[ TreeNode ],
+                     fork: TreeNode = emptyNode ): TreeNode =
         if ( nodesLeft.isEmpty ) {
           /*that is distinguishable as wrong*/
           emptyNode
@@ -561,9 +582,9 @@ object Solution {
     * must be if .size > 1 &
     * 'optimalNode.rank + height == rootNode.rank')
     */
-  def optimalDistance( root: Node,
-                       firstFork: Node,
-                       optimalNode: Node ): Int = {
+  def optimalDistance( root: TreeNode,
+                       firstFork: TreeNode,
+                       optimalNode: TreeNode ): Int = {
     //var optimalPath: Int = 0
     /*first condition must be tested
      * for optimality*/
@@ -576,30 +597,115 @@ object Solution {
    *      optimalPath
        */
     } else {*/
-    if ( firstFork == root ) {
+
+    /*if rank & height correct*/
+    if ( firstFork.CurrentRank == root.CurrentRank &&
+      (
+        root.CurrentHeight == 0 &&
+        firstFork.CurrentHeight == 0
+      ) ) {
       root.CurrentRank
     } else {
       val forkPath = firstFork.CurrentRank max firstFork.CurrentHeight
 
       /*'optimalNode.rank + height == rootNode.rank'*/
-      if ( Math.abs(optimalNode.CurrentRank - optimalNode.CurrentHeight) <= 1 &&
-          optimalNode.CurrentRank + optimalNode.CurrentHeight == root.CurrentRank ) {
+      if ( Math.abs( optimalNode.CurrentRank - optimalNode.CurrentHeight ) <= 1 &&
+        optimalNode.CurrentRank + optimalNode.CurrentHeight == root.CurrentRank ) {
         /*Math.max(optimalNode.CurrentRank, optimalNode.CurrentHeight)*/
         val optimalPath = optimalNode.CurrentRank max optimalNode.CurrentHeight
         //optimalPath = Math.max(optimalNode.CurrentRank, optimalNode.CurrentHeight)
         optimalPath
-      } else  if ( Math.abs(optimalNode.CurrentRank - optimalNode.CurrentHeight) <= 1 &&
+      } else if ( Math.abs( optimalNode.CurrentRank - optimalNode.CurrentHeight ) <= 1 &&
         optimalNode.CurrentRank + optimalNode.CurrentHeight != root.CurrentRank ) {
         /*not optimal
          * search must be continued */
-        println("!Warning! Unexpected happends!")
-        root.CurrentRank / 2
+        println( "!Warning! Unexpected happends!" )
+        /*for odd & even*/
+        root.CurrentRank - root.CurrentRank / 2
       } else {
         forkPath //*.toInt
       }
     }
     //*}
   } /*works*/
+
+  /*what if all changes reflected in 'emptyNode' &
+   * as reference screw all program logic ?
+   * but 
+   * 'emptyNode' is 'val' & unmutable*/
+  //*var oldOptimum = emptyNode
+  var oldOptimum = TreeNode( Value = -1, CurrentHeight = 0, CurrentRank = 0 )
+
+  /*limit is
+   * half from root.rank +/- 1*/
+  def currentOptimum( oldOptimum: TreeNode,
+                      pretender: TreeNode ): TreeNode =
+    /*'abs' is crucial 
+     * difference must be '0' or '1'*/
+    if ( Math.abs( pretender.CurrentRank - pretender.CurrentHeight ) <= 1 ) {
+      if ( pretender.CurrentHeight > oldOptimum.CurrentHeight || /*
+      as high as possible
+         * as close to root as possible*/
+        pretender.CurrentHeight > oldOptimum.CurrentRank ||
+        pretender.CurrentRank > oldOptimum.CurrentRank ||
+        pretender.CurrentRank > oldOptimum.CurrentHeight ) {
+        pretender
+        /*oldOptimum.CurrentHeight = pretender.CurrentHeight
+        oldOptimum.CurrentRank = pretender.CurrentRank
+        oldOptimum.Value = pretender.Value
+        /*'pretender copy*/
+        oldOptimum*/
+      } else {
+        oldOptimum
+      }
+    } else {
+      oldOptimum
+    }
+
+  var oldDistant = emptyNode
+  /*not actually needed
+   * only / solely for debug purpose*/
+  /*leaf.rank must be '0' so,
+   * pretender.CurrentRank - pretender.CurrentHeight == 
+   * pretender.CurrentHeight
+   * &
+   * for input > 1
+   * height must be > 1*/
+  /* somehow conflicts with 
+    * 'emptyNode' is: {Prev:-1,Next:List(),val:-1,h:0,R:0}*/
+  def mostDistantNode( oldDistant: TreeNode,
+                       pretender /*challenger*/ : TreeNode ): TreeNode =
+    /*if ( pretender.CurrentHeight > oldDistant.CurrentHeight &&
+      pretender.CurrentRank == 0 ) {
+      pretender
+    } else if ( pretender.CurrentHeight == oldDistant.CurrentHeight &&
+      /*???*/
+      pretender.CurrentRank < oldDistant.CurrentRank ) {
+      pretender
+    } else if ( pretender.CurrentHeight > oldDistant.CurrentHeight ) {
+      pretender
+    } else {
+      oldDistant
+    }*/
+
+    /*criteria must be filled right*/
+    if ( pretender.CurrentRank == 0 /*||
+      pretender.Children.isEmpty*/ ) {
+      if ( pretender.CurrentHeight > oldDistant.CurrentHeight ) {
+        /*as it is reference it may & will be changed elsewhere &
+         * affect choice correctness*/
+        pretender
+        /*oldDistant.CurrentHeight = pretender.CurrentHeight
+        oldDistant.CurrentRank = pretender.CurrentRank
+        oldDistant.Value = pretender.Value
+        /*'pretender copy*/
+        oldDistant*/
+      } else {
+        oldDistant
+      }
+    } else {
+      oldDistant
+    }
 
   /*until reaches all 'leafs' in subTree
   nodes with '.CurrentRank = 0'*/
@@ -609,12 +715,15 @@ object Solution {
    * rank must be == '0'
    * if has parent then
    * height != '0'*/
+  /*!!! once setted 'height' must only grow !!! */
   /**propagate 'Height' down to subtree*/
-  def subTreeHeightUpdate( parent: Int,
-                           parentHeight: Int,
-                           //*edgesMap: Map[ Int, Edge ],
-                           nodesMap: Map[ Int, Node ],
-                           parentNode: Node = emptyNode ): Unit = {
+  def subTreeHeightUpdate( //*parent: Int,
+    //*parentHeight: Int,
+    //*edgesMap: Map[ Int, Edge ],
+    nodesMap: Map[ Int, TreeNode ],
+    /*overkill ?*/
+    parentNode: TreeNode = emptyNode /*,
+                           oldOptimum: Node = emptyNode*/ ): /*Node*/ Unit = {
     if ( parentNode.Children.nonEmpty ) {
       /*place for optimization*/
       val childrenList = parentNode.Children
@@ -635,7 +744,17 @@ object Solution {
             /*must be in 'nodesMap' already*/
             val child = nodesMap( childrenLeft.head /*.End */ )
 
+            /*additional side effect
+             * ? fails when placed here ?
+             * at least no good*/
+            //oldOptimum = currentOptimum( oldOptimum,
+            //child )
+            //mostDistantNode( oldDistant: Node,
+            //child: Node )
+
+            /*where is actual update ?*/
             if ( child.CurrentHeight < /*parentHeight*/ baseHeight + 1 ) {
+              /*here it is*/
               child.CurrentHeight = /*parentHeight*/ baseHeight + 1
 
               /*what if fails ?*/
@@ -643,19 +762,32 @@ object Solution {
               if ( child.Children.isEmpty ) {
                 /*just to be sure*/
                 child.CurrentRank = 0
+
+                //oldDistant = mostDistantNode( oldDistant, child )
                 /*done & next*/
               } else {
                 /*has it's own children*/
+                /*fails when placed here*/
+                //oldOptimum = currentOptimum( oldOptimum,
+                //child )
 
                 /*propagate 'Height' down to subtree*/
-                subTreeHeightUpdate( child.Value,
-                  child.CurrentHeight,
+                subTreeHeightUpdate(
+                  //*child.Value,
+                  //*child.CurrentHeight,
                   //*edgesMap,
-                  nodesMap )
+                  nodesMap,
+                  parentNode = child
+                /*oldOptimum = currentOptimum( oldOptimum,
+                        child )*/ )
               }
 
               //innerLoop( childrenLeft.tail, parentHeight )
-            } else {
+            } else { //*no 'height' update
+              /*additional side effect
+               * fails here*/
+              //oldOptimum = currentOptimum( oldOptimum,
+              //child )              
               /*done & next*/
             }
             /*next in list*/
@@ -672,7 +804,8 @@ object Solution {
       } else {
         /*for each element in list*/
         /*initialization*/
-        innerLoop( childrenList, parentHeight )
+        innerLoop( childrenList,
+          /*parentHeight*/ parentNode.CurrentHeight )
       }
     } else {
       /*done & return*/
@@ -687,78 +820,37 @@ object Solution {
    * ( Height - Rank <= 1 ) &
    * pick one with
    * maximum possible pair of ( Height, Rank )*/
-  def currentRoot( oldRoot: Node,
-                   pretendent: Node ): Node =
+  def currentRoot( oldRoot: TreeNode,
+                   pretender /*challenger*/ : TreeNode ): TreeNode =
     /*close but topmost node missing the check
      * 'currentRoot' & similar 
      * must be called from proper place
      * or additionally checked against possible 'root'*/
-    if ( pretendent.CurrentRank > oldRoot.CurrentRank ) {
-      /*if ( pretendent.CurrentRank > oldRoot.CurrentRank &&
-      pretendent.CurrentHeight <= oldRoot.CurrentHeight ) {*/
-      pretendent
+    if ( pretender.CurrentRank > oldRoot.CurrentRank ) {
+      /*if ( pretender.CurrentRank > oldRoot.CurrentRank &&
+      pretender.CurrentHeight <= oldRoot.CurrentHeight ) {*/
+      pretender
     } else {
       oldRoot
     }
 
   /*? & height must be maximum
    * to ensure that fork node lays in the max distant path ?*/
-  def currentFork( oldFork: Node,
-                   pretendent: Node ): Node =
-    if ( pretendent.Children.nonEmpty /*isEmpty*/ ) {
+  def currentFork( oldFork: TreeNode,
+                   pretender: TreeNode ): TreeNode =
+    if ( pretender.Children.nonEmpty /*isEmpty*/ ) {
       /*close*/
-      if ( pretendent.CurrentRank > oldFork.CurrentRank &&
-        pretendent.Children.size > 1 ) {
+      if ( pretender.CurrentRank > oldFork.CurrentRank &&
+        pretender.Children.size > 1 ) {
         /*screwed the logic*/
-        /*if ( pretendent.CurrentRank >= oldFork.CurrentRank &&
-        pretendent.CurrentHeight < oldFork.CurrentHeight ) {*/
-        pretendent
+        /*if ( pretender.CurrentRank >= oldFork.CurrentRank &&
+        pretender.CurrentHeight < oldFork.CurrentHeight ) {*/
+        pretender
       } else {
         oldFork
       }
     } else {
       oldFork
-    }
-
-  /*limit is
-   * half from root.rank +/- 1*/
-  def currentOptimum( oldOptimum: Node,
-                      pretendent: Node ): Node =
-    /*'abs' is crucial */
-    if ( Math.abs( pretendent.CurrentRank - pretendent.CurrentHeight ) <= 1 ) {
-      if ( pretendent.CurrentHeight > oldOptimum.CurrentHeight || /*as high as possible
-         * as close to root as possible*/ pretendent.CurrentRank > oldOptimum.CurrentRank ) {
-        pretendent
-      } else {
-        oldOptimum
-      }
-    } else {
-      oldOptimum
-    }
-
-  /*not actually needed
-   * only / solely for debug purpose*/
-  /*leaf.rank must be '0' so,
-   * pretendent.CurrentRank - pretendent.CurrentHeight == 
-   * pretendent.CurrentHeight
-   * &
-   * for input > 1
-   * height must be > 1*/
-  /* somehow conflicts with 
-    * 'emptyNode' is: {Prev:-1,Next:List(),val:-1,h:0,R:0}*/
-  def mostDistantNode( oldDistant: Node,
-                       pretendent: Node ): Node =
-    if ( pretendent.CurrentHeight > oldDistant.CurrentHeight &&
-      pretendent.CurrentRank == 0 ) {
-      pretendent
-    } else if ( pretendent.CurrentHeight == oldDistant.CurrentHeight &&
-      /*???*/
-      pretendent.CurrentRank < oldDistant.CurrentRank ) {
-      pretendent
-    } else if ( pretendent.CurrentHeight > oldDistant.CurrentHeight ) {
-      pretendent
-    } else {
-      oldDistant
     }
 
   /*until 'root' or
@@ -775,35 +867,50 @@ object Solution {
   def parentRankUpdate( parent: Int, /*start*/
                         childRank: Int, /* = 0*/ /*end.rank*/
                         //*edgesMap: Map[ Int, Edge ],
-                        nodesMap: Map[ Int, Node ] ): Unit = {
+                        nodesMap: Map[ Int, TreeNode ] ): Unit = {
 
     /*if ( childRank == -1 ) {
       /*done & return*/
     } else {*/
     /*try to find parent in 'nodesMap'*/
-    val nodeParent: Node = nodesMap
+    val nodeParent: TreeNode = nodesMap
       .getOrElse( parent, emptyNode )
 
     if ( nodeParent == emptyNode ) {
       /*done & return*/
     } else {
+      /*additional side effect
+       * missed some nodes on 'tricky' input like
+       * from files: 6, 7 */
+      //oldOptimum = currentOptimum( oldOptimum,
+      //nodeParent )
+
       /*for example '2 > 0 + 1' */
       if ( nodeParent.CurrentRank > childRank + 1 ) {
         /*done & return*/
       } else {
         nodeParent.CurrentRank = childRank + 1
+
+        /*? does it make any sense ?
+         * that seems not*/
+        //oldDistant = mostDistantNode( oldDistant, nodeParent )
+        //oldOptimum = currentOptimum( oldOptimum,
+        //nodeParent )
+
         /*try to update futher up to 'root'*/
         /*val nextParent0: Edge =
           edgesMap
             .getOrElse( parent /*as 'end'*/ , emptyEdge )*/
+
         /*to skip default '-1'*/
-        val nextParent: Node = if ( nodeParent.Parent == -1 ) {
+        val nextParent: TreeNode = if ( nodeParent.Parent == -1 ) {
           emptyNode
         } else {
           //nodeParent.Parent.get
           /*& if it fails to 'get' ?*/
           //*nodesMap( nodeParent.Parent )
-          nodesMap.getOrElse( nodeParent.Parent, emptyNode )
+          nodesMap
+            .getOrElse( nodeParent.Parent, emptyNode )
         }
         /*nodeParent
           .Parent
@@ -880,13 +987,17 @@ object Solution {
     /*val leafsArray = new Array[ Int ]( n )*/
 
     //*var edgesMap: Map[ Int, Edge ] = Map()
-    var nodesMap: Map[ Int, Node ] = Map.empty[ Int, Node ]
-
-    var oldOptimum = emptyNode
+    var nodesMap: Map[ Int, TreeNode ] = Map.empty[ Int, TreeNode ]
+    /*? if it be declared in outer scope ?*/
+    //*var oldOptimum = emptyNode
     var oldFork = emptyNode
     var oldRoot = emptyNode
 
-    var oldDistant = emptyNode
+    /*to draw tree
+     * or for random check against
+     * optimal distance lenght
+     * from optimalNode */
+    var leafsSeq = Map.empty[ Int, TreeNode ] //Seq.empty[ Int ]
 
     /** My effective code must be
       * within that loop / for expression
@@ -921,27 +1032,42 @@ object Solution {
       val nodesMapEnd = nodesMap.getOrElse( end, emptyNode )
 
       /*may be mast be after 'nodesMap' updates*/
+      //oldDistant = mostDistantNode( oldDistant, nodesMapStart )
+      //oldDistant = mostDistantNode( oldDistant, nodesMapEnd )
       //* not needed actually but until replaced stay as it is
       /*edgesMap += ( end -> Edge(
         Start = start,
         End = end ) )*/
 
+      /*case 1
+       * root & child new*/
       if ( nodesMapStart == /*None*/ emptyNode &&
         nodesMapEnd == /*None*/ emptyNode ) {
-        nodesMap += ( start -> Node(
+        nodesMap += ( start -> TreeNode(
           Value = start,
           Children = List( end ),
           CurrentHeight = 0,
           CurrentRank = 1 ) )
-        nodesMap += ( end -> Node(
+        nodesMap += ( end -> TreeNode(
           Parent = start /*Option(start)*/ ,
           Value = end,
           CurrentHeight = 1,
           CurrentRank = 0 ) )
-      } else if ( nodesMapStart != /*None*/ emptyNode &&
+
+        /*may be pass just index: Int for 'nodesMap' ?*/
+        oldDistant = mostDistantNode( oldDistant,
+          TreeNode(
+            Parent = start,
+            Value = end,
+            CurrentHeight = 1,
+            CurrentRank = 0 ) )
+        /*case 2
+       * new child for existing 'leaf' node
+       * */
+      } else if ( nodesMapStart != emptyNode &&
         nodesMapEnd == /*None*/ emptyNode ) {
         /*new 'child' to existing 'node'*/
-        nodesMap += ( end -> Node(
+        nodesMap += ( end -> TreeNode(
           Parent = start,
           Value = end,
           //*CurrentHeight = nodesMap( start ).CurrentHeight + 1,
@@ -949,6 +1075,14 @@ object Solution {
            * nodesMapStart.CurrentHeight >= 0*/
           CurrentHeight = nodesMapStart.CurrentHeight + 1,
           CurrentRank = 0 ) )
+
+        /*using copy ?*/
+        oldDistant = mostDistantNode( oldDistant,
+          TreeNode(
+            Parent = start,
+            Value = end,
+            CurrentHeight = nodesMapStart.CurrentHeight + 1,
+            CurrentRank = 0 ) )
         //*debug
         //println("nodesMap(start).CurrentHeight:" + nodesMap(start).CurrentHeight)
         /*hope that is unique value
@@ -960,10 +1094,13 @@ object Solution {
           0, /*???*/
           //*edgesMap,
           nodesMap )
+        /*case 3
+       * new 'root' or parent node for existing child
+       * (former root)*/
       } else if ( nodesMapStart == /*None*/ emptyNode &&
-        nodesMapEnd != /*None*/ emptyNode ) {
+        nodesMapEnd != emptyNode ) {
         /*new 'root' to existing 'node'*/
-        nodesMap += ( start -> Node(
+        nodesMap += ( start -> TreeNode(
           Children = List( end ),
           Value = start,
           CurrentHeight = 0,
@@ -971,19 +1108,40 @@ object Solution {
 
         nodesMapEnd.Parent = start
         /*propagate 'Height' down to subtree*/
+        /*height must only grow
+         * !!! no reduction allowed !!! */
         subTreeHeightUpdate(
-          parent = end,
-          parentHeight = 0,
+          //*parent = end,
+          //*parentHeight = 0,
           //*edgesMap = edgesMap,
-          nodesMap = nodesMap )
-      } else if ( nodesMapStart != /*None*/ emptyNode &&
-        nodesMapEnd != /*None*/ emptyNode ) {
+          nodesMap = nodesMap,
+          parentNode = nodesMapEnd
+        /*oldOptimum = oldOptimum*/ )
+
+        /*may be value use literals ?
+         * not reference ?
+         * if aim is to get copy ?*/
+        oldDistant = mostDistantNode( oldDistant, nodesMapEnd )
+        /*oldDistant = mostDistantNode( oldDistant, 
+              TreeNode(
+                Value = nodesMapEnd.Value,
+                CurrentHeight = nodesMapEnd.CurrentHeight,
+                CurrentRank = nodesMapEnd.CurrentRank)) */
+
+        /*case 4
+       * new child for former 'leaf' or 'node' & 
+       * new parent for former 'root'*/
+      } else if ( nodesMapStart != emptyNode &&
+        nodesMapEnd != emptyNode ) {
         /*new 'height' for 'nodesMapEnd'
         *may be new 'rank' for 'nodesMapStart'
          * */
         nodesMapStart.Children +:= end
+        /*on correct input
+         * 'nodesMapEnd.Parent' was = -1*/
         nodesMapEnd.Parent = start
-        //nodesMapEnd.CurrentHeight = nodesMapStart.CurrentHeight + 1
+        nodesMapEnd.CurrentHeight = nodesMapStart.CurrentHeight + 1
+
         parentRankUpdate( /*as edge end*/ start,
           /*child rank passed to parent*/
           nodesMapEnd.CurrentRank,
@@ -991,21 +1149,47 @@ object Solution {
           nodesMap )
         /*propagate 'Height' down to subtree*/
         /*nodesMap('start').height + 1*/
-        subTreeHeightUpdate( start, /*to find all children of 'start'*/
-          nodesMapStart.CurrentHeight,
+        subTreeHeightUpdate(
+          //*start, /*to find all children of 'start' ?*/
+          //*nodesMapStart.CurrentHeight,
+          //end, /*to find all children of 'start' ?*/
+          //nodesMapEnd.CurrentHeight,
           //*edgesMap,
-          nodesMap )
+          nodesMap,
+          parentNode = nodesMapEnd
+        /*oldOptimum = oldOptimum*/ )
+
+        //oldDistant = mostDistantNode( oldDistant, nodesMapStart )
+        oldDistant = mostDistantNode( oldDistant, nodesMapEnd )
+        /*oldDistant = mostDistantNode( oldDistant, 
+        		TreeNode(
+        				Value = nodesMapStart.Value,
+        				CurrentHeight = nodesMapStart.CurrentHeight,
+        				CurrentRank = nodesMapStart.CurrentRank))         
+        oldDistant = mostDistantNode( oldDistant, 
+                      TreeNode(
+                        Value = nodesMapEnd.Value,
+                        CurrentHeight = nodesMapEnd.CurrentHeight,
+                        CurrentRank = nodesMapEnd.CurrentRank))*/
       } else {
+        /*if 'Children' then
+         * that case works at least once ?*/
+        //*debug
+        println( "!!!Unexpected case !!!" )
+        oldDistant = mostDistantNode( oldDistant, nodesMapStart )
+        oldDistant = mostDistantNode( oldDistant, nodesMapEnd )
       }
 
       /*on incorrect graph (not a tree) 
        * miss optimal node when check only nodesMapStart
        * !!! fixed !!!*/
-      oldOptimum = currentOptimum( oldOptimum: Node,
+      /*? & what if that will be placed in height propagation ?*/
+      oldOptimum = currentOptimum( oldOptimum: TreeNode,
         nodesMapStart )
       /*nothing changes*/
       /*oldOptimum = currentOptimum( oldOptimum: Node,
       		nodesMapEnd )*/
+
       /*when called from here
        * root is missing*/
       oldRoot = currentRoot( oldRoot, nodesMapStart )
@@ -1022,7 +1206,10 @@ object Solution {
        * may be called after loop to
        * improve result*/
       /*'nodesMapStart' must be checked*/
-      oldDistant = mostDistantNode( oldDistant, nodesMapStart )
+      /*somwhere in cycle
+       * after 'oldDistant' choosen 
+       * it's 'rank' changes*/
+      //*oldDistant = mostDistantNode( oldDistant, nodesMapStart )
       //*oldDistant = mostDistantNode( oldDistant, nodesMapEnd )
 
       /*do not check against all elements in 'pairArray' only i-th count
@@ -1042,7 +1229,8 @@ object Solution {
     if ( oldRoot.Parent != -1 /*default for None or Empty*/ ) {
       //*debug
       //println("'oldRoot.Parent != -1' is:" + oldRoot.Parent != -1)
-      val missingRoot = nodesMap.getOrElse( oldRoot.Parent, oldRoot )
+      val missingRoot = nodesMap
+        .getOrElse( oldRoot.Parent, oldRoot )
 
       if ( missingRoot == oldRoot ) {
       } else {
@@ -1051,16 +1239,18 @@ object Solution {
       }
     }
 
+    /*if miss last element*/
     /*unexpectedly return
      * actual 'oldDistant' is: {Prev:-1,Next:List(),val:-1,h:0,R:0}*/
-    if ( oldDistant.Children.nonEmpty ) {
-      val missingLeaf = nodesMap.getOrElse( oldDistant.Children.head, oldDistant )
+    /*if ( oldDistant.Children.nonEmpty ) {
+      val missingLeaf = nodesMap
+        .getOrElse( oldDistant.Children.head, oldDistant )
 
       if ( missingLeaf == oldDistant ) {
       } else {
         oldDistant = mostDistantNode( oldDistant, missingLeaf )
       }
-    }
+    }*/
 
     /*may be evaluated in / during input
      * not after*/
@@ -1086,16 +1276,22 @@ object Solution {
     //*lazy val rFork = rankFork( nodesMap/*, edgesMap */)
 
     //*debug
-    /*println( "expected 'mostDistantLeaf' is: " + mostDistantLeaf )
-    println( "actual 'oldDistant' is: " + oldDistant )
-    println( "expected 'optimalNode' is: " + optimalNode )
-    println( "actual 'oldOptimum' is: " + oldOptimum )
-    println( "expected 'rootNode' is: " + rootNode )
-    println( "actual 'oldRoot' is: " + oldRoot )
-    println( "expected 'rFork' is: " + rFork )
-    println( "expected 'fFork' is: " + fFork )
-    println( "actual 'oldFork' is: " + oldFork )
-    println( "actual 'nodesMap' is: " + nodesMap.take( 20 ).mkString( "<", "|", ">" ) )
+    //*println( "expected 'mostDistantLeaf' is: " + mostDistantLeaf )
+    /*reference not affect result*/
+    //*println( "'oldDistant' is: " + oldDistant )
+    /*println( "actual 'oldDistant' is: " +
+      nodesMap.getOrElse( oldDistant.Value, "Not found" ) )*/
+    //*println( "expected 'optimalNode' is: " + optimalNode )
+    //*println( "'oldOptimum' is: " + oldOptimum )
+    /*println( "actual 'oldOptimum' is: " +
+      nodesMap.getOrElse( oldOptimum.Value, "Not found" ) )*/
+    //*println( "expected 'rootNode' is: " + rootNode )
+    //*println( "actual 'oldRoot' is: " + oldRoot )
+    
+    //*println( "expected 'rFork' is: " + rFork )
+    //*println( "expected 'fFork' is: " + fFork )
+    //*println( "actual 'oldFork' is: " + oldFork )
+    /*println( "actual 'nodesMap' is: " + nodesMap.take( 20 ).mkString( "<", "|", ">" ) )
     println( "actual 'nodesMap.size' is: " + nodesMap.size )*/
 
     /*return value
@@ -1184,19 +1380,19 @@ object Solution {
       optimalDistance( root = rootNode,
         firstFork = fork,
         optimalNode = optimalNode ) )*/
-    println( "'emptyNode' is: " + emptyNode )
+    //*println( "'emptyNode' is: " + emptyNode )
     println( "expected # for Test_1_output.txt is: " + 2 )
-    println( "actual # is: " + inputTest( 1 ) )
+    //*println( "actual # is: " + inputTest( 1 ) )
     println( "expected # for Test_2_output.txt is: " + 2 )
-    println( "actual # is: " + inputTest( 2 ) )
+    //*println( "actual # is: " + inputTest( 2 ) )
     println( "expected # for Test_3_output.txt is: " + 3 )
-    println( "actual # is: " + inputTest( 3 ) )
+    //*println( "actual # is: " + inputTest( 3 ) )
     println( "expected # for Test_4_output.txt is: " + 5 )
-    println( "actual # is: " + inputTest( 4 ) )
+    //*println( "actual # is: " + inputTest( 4 ) )
     println( "expected # for Test_5_output.txt is: " + 5 )
-    println( "actual # is: " + inputTest( 5 ) )
+    //*println( "actual # is: " + inputTest( 5 ) )
     println( "expected # for Test_6_output.txt is: " + 7 )
-    println( "actual # is: " + inputTest( 6 ) )
+    //*println( "actual # is: " + inputTest( 6 ) )
     /* some glich in input data - Yes it is
      * input not a 'Tree'
      * one child has two parents
@@ -1210,13 +1406,29 @@ object Solution {
     expected 'fork' is: {Prev:383,Next:List(365, 646),val:1099,h:1,R:13}
     actual 'oldFork' is: {Prev:774,Next:List(365, 1089),val:1152,h:0,R:13}
     */
+    /* & there is more
+     * 'oldDistant' is: {Prv1176[421]Nxt()h11R0}
+      actual 'oldDistant' is: {Prv1176[421]Nxt()h11?close but?R0}
+      'oldOptimum' is: {Prv186[435]Nxt(495,120,83)h6R8?6-8=1? or 
+      rank grows after the check?}
+      actual 'oldOptimum' is: {Prv186[435]Nxt(495,120,83)h6R8}
+      actual 'oldRoot' is: {Prv-1[774]Nxt(1152)h0R14}
+      actual 'oldFork' is: {Prv774[1152]Nxt(365,1089)h0???R13}
+      actual # is: 13
+     * */
     //println( "expected 'oldOptimum' for Test_6_output.txt is: " + optimalNode )
     //println( "actual 'oldOptimum' for Test_6_output.txt is: " + oldOptimum )
+
     println( "expected # for Test_7_output.txt is: " + 15 )
-    println( "actual # is: " + inputTest( 7 ) )
-    println( "expected # for Test_8_output.txt is: " + 9 )
+    //*println( "actual # is: " + inputTest( 7 ) )
+    //*println( "expected # for Test_8_output.txt is: " + 9 )
     //*println( "actual is: " + inputTest( 8 ) )
-    println( "expected # for Test_9_output.txt is: " + 15 )
+    //*println( "expected # for Test_9_output.txt is: " + 15 )
+    /*Strange behavior
+     * previous statments like inputTest( 7 ) call
+     * affects 'oldOptimum' calculation
+     * to non existing or whrong values
+     * file stream glitch ?*/
     println( "expected # for Test_10_output.txt is: " + 5 )
     println( "actual # is: " + inputTest( 10 ) )
 
